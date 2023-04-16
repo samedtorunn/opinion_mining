@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block body_content %}
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Opinion Miner</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Welcome message -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Welcome to Opinion Miner!</h1>
+                <p>Get insights on any topic by analyzing opinions from Reddit.</p>
+            </div>
+            <div class="col-md-6">
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Query form -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form action="{% url 'opinions' %}" method="get" class="d-flex">
+                    <input type="text" name="query" id="query" class="form-control me-2" placeholder="Enter a query" required>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top posts table -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h3>Top posts:</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in top_posts %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ post.title }}</td>
+                                <td>{{ post.score }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block body_content %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">Opinion Miner</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1>Opinions on "{{ topic }}"</h1>
+        {% include 'sentiment_table.html' %}
+        {% if opinions %}
+            <div class="row">
+                {% for opinion in opinions %}
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ opinion.title }}</h5>
+                                {% if opinion.text %}
+                                    <p class="card-text">{{ opinion.text }}</p>
+                                {% endif %}
+                                <p class="card-text"><small class="text-muted">Sentiment: {{ opinion.sentiment }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <p>No opinions found for "{{ topic }}".</p>
+        {% endif %}
+    </div>
+{% endblock %}
