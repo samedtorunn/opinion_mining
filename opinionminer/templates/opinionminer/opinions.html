@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block body_content %}
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
@@ -33,6 +35,15 @@
                 </form>
             </div>
         </div>
+        <br>
+        <!-- Trends section -->
+        <div class="container mt-5">
+            <h2>Trends</h2>
+            <div id="opinion-trends">
+                <img src="{% static 'opinionminer/trend_graph.png' %}" alt="Trend Graph">
+            </div>
+        </div>
+        <br>
         {% if opinions %}
             <div class="row">
                 {% for opinion in opinions %}
@@ -41,7 +52,13 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ opinion.title }}</h5>
                                 {% if opinion.text %}
-                                    <p class="card-text">{{ opinion.text }}</p>
+                                    <p class="card-text">
+                                        {% if opinion.text|length > 100 %}
+                                            {{ opinion.text|slice:":100" }}...
+                                        {% else %}
+                                            {{ opinion.text }}
+                                        {% endif %}
+                                    </p>
                                 {% endif %}
                                 <p class="card-text"><small class="text-muted">Sentiment: {{ opinion.sentiment }}</small></p>
                             </div>

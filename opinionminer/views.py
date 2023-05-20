@@ -3,11 +3,20 @@ from .reddit_opinions import get_opinions, get_sentiment_distribution
 from .forms import QueryForm
 from .models import Opinion
 from django.urls import reverse
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 
 def home_view(request):
     return render(request, 'opinionminer/home.html')
 
+
+import numpy as np
 
 def opinions_view(request):
     form = QueryForm(request.GET or None)
@@ -17,8 +26,65 @@ def opinions_view(request):
         end_date = form.cleaned_data['end_date']
         opinions = get_opinions(topic, start_date, end_date)
         sentiment_distribution = get_sentiment_distribution(opinions)
-        return render(request, 'opinionminer/opinions.html', {'opinions': opinions, 'topic': topic, 'sentiment_distribution': sentiment_distribution})
+
+        # Calculate daily trends
+        datewise_opinions = {}
+        current_date = start_date
+        while current_date <= end_date:
+            datewise_opinions[current_date] = {
+                'positive': 0,
+                'neutral': 0,
+                'negative': 0
+            }
+            current_date += timedelta(days=1)
+
+        for opinion in opinions:
+            opinion_date = opinion.date
+            sentiment = opinion.sentiment
+            datewise_opinions[opinion_date][sentiment] += 1
+
+        # Prepare data for trend graph
+        dates = list(datewise_opinions.keys())
+        positive_counts = [datewise_opinions[date]['positive'] for date in dates]
+        neutral_counts = [datewise_opinions[date]['neutral'] for date in dates]
+        negative_counts = [datewise_opinions[date]['negative'] for date in dates]
+
+        # Create trend graph
+        plt.switch_backend('Agg')
+        plt.figure(figsize=(12, 6))
+
+        # Define cool palette colors
+        colors = ['dodgerblue', 'limegreen', 'tomato']
+
+
+        # Plot trend lines with cool palette colors
+        plt.plot(dates, positive_counts, label='Positive', color=colors[1])
+        plt.plot(dates, neutral_counts, label='Neutral', color=colors[0])
+        plt.plot(dates, negative_counts, label='Negative', color=colors[2])
+
+        # Customize the graph appearance
+
+        plt.xlabel('Date')
+        plt.ylabel('Opinion Count')
+        plt.title('Daily Trends of Opinions')
+        plt.xticks(rotation=45)
+        plt.legend()
+        plt.tight_layout()
+
+
+        # Save the trend graph
+        graph_path = 'opinionminer/static/opinionminer/trend_graph.png'
+        plt.savefig(graph_path)
+        plt.close()
+
+        return render(request, 'opinionminer/opinions.html', {
+            'opinions': opinions,
+            'topic': topic,
+            'sentiment_distribution': sentiment_distribution,
+            'trend_graph': graph_path
+        })
     return redirect('home')
+
 
 
 def get_sentiment_distribution(opinions):

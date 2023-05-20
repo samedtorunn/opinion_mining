@@ -36,7 +36,7 @@ def get_opinions(topic, start_date, end_date):
         submission_time = datetime.fromtimestamp(submission.created_utc)
         if start_time <= submission_time <= end_time:
             sentiment = get_sentiment(submission.title + submission.selftext)
-            opinion = Opinion(title=submission.title, text=submission.selftext, sentiment=sentiment)
+            opinion = Opinion(title=submission.title, text=submission.selftext, sentiment=sentiment, date=submission_time.date())
             opinions.append(opinion)
 
     return opinions
