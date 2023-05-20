@@ -9,14 +9,12 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-
+from wordcloud import WordCloud
 
 
 def home_view(request):
     return render(request, 'opinionminer/home.html')
 
-
-import numpy as np
 
 def opinions_view(request):
     form = QueryForm(request.GET or None)
@@ -68,6 +66,7 @@ def opinions_view(request):
         plt.ylabel('Opinion Count')
         plt.title('Daily Trends of Opinions')
         plt.xticks(rotation=45)
+        plt.grid(True)
         plt.legend()
         plt.tight_layout()
 
@@ -76,6 +75,15 @@ def opinions_view(request):
         graph_path = 'opinionminer/static/opinionminer/trend_graph.png'
         plt.savefig(graph_path)
         plt.close()
+
+        # Generate word cloud data
+        text_data = ' '.join(opinion.text for opinion in opinions)
+        wordcloud = WordCloud(width=1200, height=400, background_color='white').generate(text_data)
+
+
+
+        wordcloud_path = 'opinionminer/static/opinionminer/wordcloud.png'
+        wordcloud.to_file(wordcloud_path)
 
         return render(request, 'opinionminer/opinions.html', {
             'opinions': opinions,

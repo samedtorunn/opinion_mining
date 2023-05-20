@@ -3,6 +3,8 @@ import praw
 from textblob import TextBlob
 from .models import Opinion
 from datetime import datetime, timedelta
+from langdetect import detect
+
 
 # Creative_Intern7785
 
@@ -10,7 +12,6 @@ from datetime import datetime, timedelta
 reddit = praw.Reddit(client_id=client_id,
                      client_secret=secret_key,
                      user_agent='My first App for Opinion Mining')
-
 
 def get_sentiment(text):
     blob = TextBlob(text)
@@ -21,7 +22,6 @@ def get_sentiment(text):
         return 'negative'
     else:
         return 'neutral'
-
 
 def get_opinions(topic, start_date, end_date):
     opinions = []
@@ -35,12 +35,14 @@ def get_opinions(topic, start_date, end_date):
         # Check if the submission falls within the specified timeline
         submission_time = datetime.fromtimestamp(submission.created_utc)
         if start_time <= submission_time <= end_time:
-            sentiment = get_sentiment(submission.title + submission.selftext)
-            opinion = Opinion(title=submission.title, text=submission.selftext, sentiment=sentiment, date=submission_time.date())
-            opinions.append(opinion)
+            # Detect the language of the post
+            lang = detect(submission.title + submission.selftext)
+            if lang == 'en':
+                sentiment = get_sentiment(submission.title + submission.selftext)
+                opinion = Opinion(title=submission.title, text=submission.selftext, sentiment=sentiment, date=submission_time.date())
+                opinions.append(opinion)
 
     return opinions
-
 
 def get_sentiment_distribution(opinions):
     distribution = {
