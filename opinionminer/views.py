@@ -10,6 +10,9 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from wordcloud import WordCloud
+import sklearn
+from sklearn.linear_model import LinearRegression
+
 
 
 def home_view(request):
@@ -47,21 +50,33 @@ def opinions_view(request):
         neutral_counts = [datewise_opinions[date]['neutral'] for date in dates]
         negative_counts = [datewise_opinions[date]['negative'] for date in dates]
 
+        # Calculate linear regression lines
+        x = np.arange(len(dates)).reshape(-1, 1)
+        regression_lines = {
+            'positive': LinearRegression().fit(x, positive_counts),
+            'neutral': LinearRegression().fit(x, neutral_counts),
+            'negative': LinearRegression().fit(x, negative_counts)
+        }
+
         # Create trend graph
         plt.switch_backend('Agg')
         plt.figure(figsize=(12, 6))
 
         # Define cool palette colors
-        colors = ['dodgerblue', 'limegreen', 'tomato']
-
+        colors = ['dodgerblue', 'green', 'tomato']
 
         # Plot trend lines with cool palette colors
-        plt.plot(dates, positive_counts, label='Positive', color=colors[1])
-        plt.plot(dates, neutral_counts, label='Neutral', color=colors[0])
-        plt.plot(dates, negative_counts, label='Negative', color=colors[2])
+        plt.plot(dates, positive_counts, label='Positive', color=colors[1], linewidth=3)
+        plt.plot(dates, neutral_counts, label='Neutral', color=colors[0], linewidth=3)
+        plt.plot(dates, negative_counts, label='Negative', color=colors[2], linewidth=3)
+
+
+        for sentiment, regression_line in regression_lines.items():
+            y_pred = regression_line.predict(x)
+            color = colors[1] if sentiment == 'positive' else colors[0] if sentiment == 'neutral' else colors[2]
+            plt.plot(dates, y_pred, linestyle='dashed', label=f'{sentiment} regression line', color=color)
 
         # Customize the graph appearance
-
         plt.xlabel('Date')
         plt.ylabel('Opinion Count')
         plt.title('Daily Trends of Opinions')
@@ -69,7 +84,6 @@ def opinions_view(request):
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
-
 
         # Save the trend graph
         graph_path = 'opinionminer/static/opinionminer/trend_graph.png'
@@ -80,8 +94,7 @@ def opinions_view(request):
         text_data = ' '.join(opinion.text for opinion in opinions)
         wordcloud = WordCloud(width=1200, height=400, background_color='white').generate(text_data)
 
-
-
+        # Save the word cloud image
         wordcloud_path = 'opinionminer/static/opinionminer/wordcloud.png'
         wordcloud.to_file(wordcloud_path)
 
@@ -89,7 +102,8 @@ def opinions_view(request):
             'opinions': opinions,
             'topic': topic,
             'sentiment_distribution': sentiment_distribution,
-            'trend_graph': graph_path
+            'trend_graph': graph_path,
+            'wordcloud': wordcloud_path
         })
     return redirect('home')
 
