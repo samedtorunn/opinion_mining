@@ -17,7 +17,7 @@ The opinion mining tool is designed to provide insights on any topic by analyzin
 
 1. Clone the repository: `git clone https://github.com/samedtorunn/opinion_mining.git`
 2. Install the required dependencies: `pip3 install -r requirements.txt`
-3. Configure the necessary API credentials for social media platforms in the `config.py` file.
+3. Configure the necessary API credentials (yours or the ones given by me)
 4. Make migrations: `python3 manage.py makemigrations`
 5. Migrate: `python3 manage.py migrate`
 6. Run the project: `python3 manage.py runserver`
