@@ -41,6 +41,8 @@
             <div class="col-md-6">
                 <form action="{% url 'opinions' %}" method="get" class="d-flex">
                     <input type="text" name="query" id="query" class="form-control me-2" placeholder="Enter a query" required>
+                    <input type="date" name="start_date" id="start_date" class="form-control me-2" required>
+                    <input type="date" name="end_date" id="end_date" class="form-control me-2" required>
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
             </div>
