@@ -5,11 +5,9 @@ body {
     background-size: cover;
 }
 
-
 .navbar-custom {
     opacity: 0.5;
 }
-
 
 .bottom-text {
     opacity: 0.5;
@@ -19,7 +17,6 @@ body {
     background-color: #ffffff;
 }
 
-
 .background {
     position: fixed;
     top: 0;
@@ -28,6 +25,6 @@ body {
     height: 100%;
     z-index: -1;
     background-size: cover;
-    filter: opacity(0.3); /* Adjust the opacity as desired */
+    filter: opacity(0.3);
     pointer-events: none;
 }

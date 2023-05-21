@@ -16,6 +16,7 @@ reddit = praw.Reddit(client_id=client_id,
 def get_sentiment(text):
     blob = TextBlob(text)
     sentiment_score = blob.sentiment.polarity
+
     if sentiment_score > 0:
         return 'positive'
     elif sentiment_score < 0:
@@ -30,19 +31,31 @@ def get_opinions(topic, start_date, end_date):
     start_time = datetime.combine(start_date, datetime.min.time())
     end_time = datetime.combine(end_date, datetime.max.time())
 
-    # Retrieve posts within the specified timeline
+
+    # Retrieve posts from the general Reddit search
     for submission in reddit.subreddit('all').search(topic, time_filter='all'):
-        # Check if the submission falls within the specified timeline
         submission_time = datetime.fromtimestamp(submission.created_utc)
         if start_time <= submission_time <= end_time:
-            # Detect the language of the post
             lang = detect(submission.title + submission.selftext)
             if lang == 'en':
                 sentiment = get_sentiment(submission.title + submission.selftext)
-                opinion = Opinion(title=submission.title, text=submission.selftext, sentiment=sentiment, date=submission_time.date())
+                opinion = Opinion(title=submission.title, text=submission.selftext,
+                                  sentiment=sentiment, date=submission_time.date())
+                opinions.append(opinion)
+
+    # Retrieve posts from the specified subreddit
+    for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
+        submission_time = datetime.fromtimestamp(submission.created_utc)
+        if start_time <= submission_time <= end_time:
+            lang = detect(submission.title + submission.selftext)
+            if lang == 'en':
+                sentiment = get_sentiment(submission.title + submission.selftext)
+                opinion = Opinion(title=submission.title, text=submission.selftext,
+                                  sentiment=sentiment, date=submission_time.date())
                 opinions.append(opinion)
 
     return opinions
+
 
 def get_sentiment_distribution(opinions):
     distribution = {
@@ -58,3 +71,26 @@ def get_sentiment_distribution(opinions):
         elif opinion.sentiment == 'negative':
             distribution['negative'] += 1
     return distribution
+
+
+
+# Only for subreddit posts.
+
+# def get_subreddit_opinions(subreddit, start_date, end_date):
+#     opinions = []
+#
+#     start_time = datetime.combine(start_date, datetime.min.time())
+#     end_time = datetime.combine(end_date, datetime.max.time())
+#
+#     for submission in reddit.subreddit(subreddit).search(subreddit, time_filter='all'):
+#         submission_time = datetime.fromtimestamp(submission.created_utc)
+#         if start_time <= submission_time <= end_time:
+#             lang = detect(submission.title + submission.selftext)
+#             if lang == 'en':
+#                 sentiment = get_sentiment(submission.title + submission.selftext)
+#                 opinion = Opinion(title=submission.title, text=submission.selftext,
+#                                   sentiment=sentiment, date=submission_time.date())
+#                 opinions.append(opinion)
+#
+#     return opinions
+

@@ -26,6 +26,7 @@ def opinions_view(request):
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
         opinions = get_opinions(topic, start_date, end_date)
+
         sentiment_distribution = get_sentiment_distribution(opinions)
 
         # Calculate daily trends
@@ -58,14 +59,14 @@ def opinions_view(request):
             'negative': LinearRegression().fit(x, negative_counts)
         }
 
-        # Create trend graph
+
         plt.switch_backend('Agg')
         plt.figure(figsize=(12, 6))
 
-        # Define cool palette colors
-        colors = ['dodgerblue', 'green', 'tomato']
+        # Define colors
+        colors = ['lightgray', 'green', 'red']
 
-        # Plot trend lines with cool palette colors
+        # Plot trend lines
         plt.plot(dates, positive_counts, label='Positive', color=colors[1], linewidth=3)
         plt.plot(dates, neutral_counts, label='Neutral', color=colors[0], linewidth=3)
         plt.plot(dates, negative_counts, label='Negative', color=colors[2], linewidth=3)
@@ -123,3 +124,4 @@ def get_sentiment_distribution(opinions):
         elif opinion.sentiment == 'negative':
             distribution['negative'] += 1
     return distribution
+
