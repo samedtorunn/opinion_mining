@@ -11,6 +11,7 @@ import prawcore
 # Creative_Intern7785
 
 
+
 reddit = praw.Reddit(client_id=client_id,
                      client_secret=secret_key,
                      user_agent='My first App for Opinion Mining')
