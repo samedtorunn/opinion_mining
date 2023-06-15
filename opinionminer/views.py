@@ -18,6 +18,9 @@ from uuid import uuid4
 def home_view(request):
     return render(request, 'opinionminer/home.html')
 
+def about_view(request):
+    return render(request, 'opinionminer/about.html')
+
 
 def get_sentiment_distribution(opinions):
     distribution = {
