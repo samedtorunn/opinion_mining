@@ -1,4 +1,4 @@
-{% if sentiment_distribution %}
+{% if result.sentiment_distribution %}
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -9,15 +9,15 @@
         <tbody>
             <tr>
                 <td>Positive</td>
-                <td>{{ sentiment_distribution.positive }}</td>
+                <td>{{ result.sentiment_distribution.positive }}</td>
             </tr>
             <tr>
                 <td>Neutral</td>
-                <td>{{ sentiment_distribution.neutral }}</td>
+                <td>{{ result.sentiment_distribution.neutral }}</td>
             </tr>
             <tr>
                 <td>Negative</td>
-                <td>{{ sentiment_distribution.negative }}</td>
+                <td>{{ result.sentiment_distribution.negative }}</td>
             </tr>
         </tbody>
     </table>
