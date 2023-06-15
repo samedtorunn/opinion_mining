@@ -12,6 +12,7 @@ import numpy as np
 from wordcloud import WordCloud
 import sklearn
 from sklearn.linear_model import LinearRegression
+from wordcloud import STOPWORDS
 
 
 
@@ -93,7 +94,12 @@ def opinions_view(request):
 
         # Generate word cloud data
         text_data = ' '.join(opinion.text for opinion in opinions)
-        wordcloud = WordCloud(width=1200, height=400, background_color='white').generate(text_data)
+        excluded_words = set(STOPWORDS)  # Use the set of default STOPWORDS
+        excluded_words.update(['https', 'www', 'com'])  # Add additional words to exclude
+        wordcloud = WordCloud(width=1200, height=400, background_color='white', stopwords=excluded_words).generate(
+            text_data)
+
+        #wordcloud = WordCloud(width=1200, height=400, background_color='white').generate(text_data)
 
         # Save the word cloud image
         wordcloud_path = 'opinionminer/static/opinionminer/wordcloud.png'
