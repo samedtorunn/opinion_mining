@@ -14,8 +14,8 @@ The opinion mining tool is designed to provide insights on any topic by analyzin
 4. Run the command: docker run -p 8000:8000 <name_the_docker>
 5. You can access the project via http://0.0.0.0:8000/
 
-
-The project can be opened and used via **[44.200.246.83:8000](44.200.246.83:8000)** address. It is dockerized and actively running on an EC2 Ubuntu instance. 
+The part below may not work properly since there is a constant update process on the project.
+~~The project can be opened and used via **[44.200.246.83:8000](44.200.246.83:8000)** address. It is dockerized and actively running on an EC2 Ubuntu instance.~~ 
 
 
 ## Features

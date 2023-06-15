@@ -1,15 +1,40 @@
 {% extends 'base.html' %}
 
+{% load static %}
 {% block title %}About{% endblock %}
+{% block body_content %}
+<body class="white-background" style="background-color: white; background-image: none">
 
-{% block content %}
-<h1>About</h1>
-<p>Welcome to our Opinion Mining application. This application allows you to analyze opinions and sentiments from Reddit posts.</p>
-<p>With our app, you can:</p>
-<ul>
-  <li>Search for specific topics and analyze related opinions</li>
-  <li>View sentiment distribution and daily trends of opinions</li>
-  <li>Generate word clouds to visualize common words used in opinions</li>
-</ul>
-<p>We hope you find this application useful for your opinion mining needs. If you have any questions or feedback, please contact us.</p>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-gradient-info">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">👁️ Opinion Miner</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about/">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1>About</h1>
+        <p>Welcome to our Opinion Mining application. This application allows you to analyze opinions and sentiments from Reddit posts.</p>
+        <p>With our app, you can:</p>
+        <ul>
+            <li>Search for specific topics and analyze related opinions</li>
+            <li>View sentiment distribution and daily trends of opinions</li>
+            <li>Generate word clouds to visualize common words used in opinions</li>
+        </ul>
+        <p>We hope you find this application useful for your opinion mining needs. If you have any questions or feedback, please contact us.</p>
+    </div>
+</body>
 {% endblock %}
