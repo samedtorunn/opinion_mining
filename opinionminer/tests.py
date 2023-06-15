@@ -7,6 +7,9 @@ from datetime import date
 from .models import Opinion
 from .reddit_opinions import get_opinions, get_sentiment_distribution
 from .forms import QueryForm
+from django.test import TestCase, RequestFactory
+from django.urls import reverse
+from .views import home_view, opinions_view
 
 
 class OpinionTestCase(TestCase):
@@ -87,3 +90,22 @@ class OpinionTestCase(TestCase):
         self.assertEqual(get_sentiment(negative_text), 'negative')
         self.assertEqual(get_sentiment(neutral_text), 'neutral')
         print("Sentiments are right.")
+
+
+
+
+class OpinionMinerTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_home_view(self):
+        request = self.factory.get(reverse('home'))
+        response = home_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'opinionminer/home.html')
+
+    def test_opinions_view(self):
+        request = self.factory.get(reverse('opinions'), {'query': 'test', 'start_date': '2022-01-01', 'end_date': '2022-01-02'})
+        response = opinions_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'opinionminer/opinions.html')

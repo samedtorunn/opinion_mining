@@ -59,7 +59,7 @@ def get_opinions(topic, start_date, end_date):
         # Handle subreddit not found error
         return []
 
-    # Remove spaces and convert to lowercase
+    # Remove spaces and convert to lowercase when checking for subreddit
     topic = topic.replace(" ", "").lower()
 
     if subreddit_exists(topic):

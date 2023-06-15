@@ -38,8 +38,7 @@ def get_sentiment_distribution(opinions):
     return distribution
 
 
-def analyze_opinions(topic:str, opinions: list[Opinion], start_date, end_date):
-
+def analyze_opinions(topic: str, opinions: list[Opinion], start_date, end_date):
     sentiment_distribution = get_sentiment_distribution(opinions)
 
     # Calculate daily trends
@@ -58,64 +57,7 @@ def analyze_opinions(topic:str, opinions: list[Opinion], start_date, end_date):
         sentiment = opinion.sentiment
         datewise_opinions[opinion_date][sentiment] += 1
 
-    # Prepare data for trend graph
-    dates = list(datewise_opinions.keys())
-    positive_counts = [datewise_opinions[date]['positive'] for date in dates]
-    neutral_counts = [datewise_opinions[date]['neutral'] for date in dates]
-    negative_counts = [datewise_opinions[date]['negative'] for date in dates]
-
-    # Calculate linear regression lines
-    x = np.arange(len(dates)).reshape(-1, 1)
-    regression_lines = {
-        'positive': LinearRegression().fit(x, positive_counts),
-        'neutral': LinearRegression().fit(x, neutral_counts),
-        'negative': LinearRegression().fit(x, negative_counts)
-    }
-
-
-    plt.switch_backend('Agg')
-    plt.figure(figsize=(12, 6))
-
-    # Define colors
-    colors = ['lightgray', 'green', 'red']
-
-    # Plot trend lines
-    plt.plot(dates, positive_counts, label='Positive', color=colors[1], linewidth=3)
-    plt.plot(dates, neutral_counts, label='Neutral', color=colors[0], linewidth=3)
-    plt.plot(dates, negative_counts, label='Negative', color=colors[2], linewidth=3)
-
-
-    for sentiment, regression_line in regression_lines.items():
-        y_pred = regression_line.predict(x)
-        color = colors[1] if sentiment == 'positive' else colors[0] if sentiment == 'neutral' else colors[2]
-        plt.plot(dates, y_pred, linestyle='dashed', label=f'{sentiment} regression line', color=color)
-
-    # Customize the graph appearance
-    plt.xlabel('Date')
-    plt.ylabel(f'{topic.title()} Opinion Count')
-    plt.title(f'Daily Trends of Opinions on {topic.title()}')
-    plt.xticks(rotation=45)
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-
-    # Save the trend graph
-    trend_graph = f'/static/opinionminer/trend_graph-{uuid4()}.png'
-    plt.savefig('opinionminer'+ trend_graph)
-    plt.close()
-
-    # Generate word cloud data
-    text_data = ' '.join(opinion.text for opinion in opinions)
-    excluded_words = set(STOPWORDS)  # Use the set of default STOPWORDS
-    excluded_words.update(['https', 'www', 'com'])  # Add additional words to exclude
-    wordcloud = WordCloud(width=1200, height=400, background_color='white', stopwords=excluded_words).generate(
-        text_data)
-
-    #wordcloud = WordCloud(width=1200, height=400, background_color='white').generate(text_data)
-
-    # Save the word cloud image
-    wordcloud_path = f'/static/opinionminer/wordcloud-{uuid4()}.png'
-    wordcloud.to_file('opinionminer' + wordcloud_path)
+    trend_graph, wordcloud_path = create_and_save_graphs(topic, opinions, datewise_opinions, start_date, end_date)
 
     return {
         'opinions': opinions,
@@ -160,3 +102,60 @@ def opinions_view(request):
         })
 
 
+def create_and_save_graphs(topic: str, opinions: list[Opinion], datewise_opinions, start_date, end_date):
+    # Prepare data for trend graph
+    dates = list(datewise_opinions.keys())
+    positive_counts = [datewise_opinions[date]['positive'] for date in dates]
+    neutral_counts = [datewise_opinions[date]['neutral'] for date in dates]
+    negative_counts = [datewise_opinions[date]['negative'] for date in dates]
+
+    # Calculate linear regression lines
+    x = np.arange(len(dates)).reshape(-1, 1)
+    regression_lines = {
+        'positive': LinearRegression().fit(x, positive_counts),
+        'neutral': LinearRegression().fit(x, neutral_counts),
+        'negative': LinearRegression().fit(x, negative_counts)
+    }
+
+    plt.switch_backend('Agg')
+    plt.figure(figsize=(12, 6))
+
+    # Define colors
+    colors = ['lightgray', 'green', 'red']
+
+    # Plot trend lines
+    plt.plot(dates, positive_counts, label='Positive', color=colors[1], linewidth=3)
+    plt.plot(dates, neutral_counts, label='Neutral', color=colors[0], linewidth=3)
+    plt.plot(dates, negative_counts, label='Negative', color=colors[2], linewidth=3)
+
+    for sentiment, regression_line in regression_lines.items():
+        y_pred = regression_line.predict(x)
+        color = colors[1] if sentiment == 'positive' else colors[0] if sentiment == 'neutral' else colors[2]
+        plt.plot(dates, y_pred, linestyle='dashed', label=f'{sentiment} regression line', color=color)
+
+    # Customize the graph appearance
+    plt.xlabel('Date')
+    plt.ylabel(f'{topic.title()} Opinion Count')
+    plt.title(f'Daily Trends of Opinions on {topic.title()}')
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+
+    # Save the trend graph
+    trend_graph = f'/static/opinionminer/trend_graph-{uuid4()}.png'
+    plt.savefig('opinionminer' + trend_graph)
+    plt.close()
+
+    # Generate word cloud data
+    text_data = ' '.join(opinion.text for opinion in opinions)
+    excluded_words = set(STOPWORDS)  # Use the set of default STOPWORDS
+    excluded_words.update(['https', 'www', 'com'])  # Add additional words to exclude
+    wordcloud = WordCloud(width=1200, height=400, background_color='white', stopwords=excluded_words).generate(
+        text_data)
+
+    # Save the word cloud image
+    wordcloud_path = f'/static/opinionminer/wordcloud-{uuid4()}.png'
+    wordcloud.to_file('opinionminer' + wordcloud_path)
+
+    return trend_graph, wordcloud_path
