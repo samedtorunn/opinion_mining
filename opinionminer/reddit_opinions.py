@@ -73,8 +73,9 @@ def extract_noun_phrases(text):
 
 
 def correct_spelling(text):
-    doc = nlp(text)
-    corrected_text = ' '.join(token.text if token._.suggestions is None else token._.suggestions[0] for token in doc)
+    text = TextBlob(text)
+    corrected_text = text.correct()
+    corrected_text = str(corrected_text)
     return corrected_text
 
 
@@ -96,7 +97,6 @@ def get_opinions(topic, start_date, end_date):
                     correct_spelling(submission.title)
                     correct_spelling(submission.selftext)
                     noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
-                    print(noun_phrases)
                     sentiment = get_sentiment_for_noun_phrases_array(noun_phrases)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date(),

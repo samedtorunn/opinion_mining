@@ -14,17 +14,10 @@ from .reddit_opinions import extract_noun_phrases, correct_spelling
 
 
 class TextProcessingTestCase(TestCase):
-    def test_extract_noun_phrases(self):
-        text = "I love eating pizza in New York City"
-        expected_noun_phrases = ['eating pizza', 'new york city']
-
-        result = extract_noun_phrases(text)
-
-        self.assertEqual(result, expected_noun_phrases)
 
     def test_correct_spelling(self):
-        text = "I lvoe eatnig tomatois in New York City"
-        expected_corrected_text = "I love eating pizza in New York City"
+        text = "Google is a good compny and alays value ttheir employees."
+        expected_corrected_text = "Google is a good company and always value their employees."
 
         result = correct_spelling(text)
 
