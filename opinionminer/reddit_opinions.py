@@ -28,16 +28,24 @@ def get_sentiment(text):
     else:
         return 'neutral'
 
+
 def get_sentiment_for_noun_phrases_array(noun_phrases):
         sentiment_scores = []
 
         for phrase in noun_phrases:
             blob = TextBlob(phrase)
             sentiment_score = blob.sentiment.polarity
-            sentiment_scores.append(sentiment_score)
+            sentiment_subjectivity = blob.sentiment.subjectivity
+
+            # To get more sharp results, subjectivity is decreased.
+            if sentiment_subjectivity <= 0.3:
+                sentiment_scores.append(sentiment_score)
 
         # Calculate the overall sentiment based on the average score
-        average_score = sum(sentiment_scores) / len(sentiment_scores)
+        if len(sentiment_scores) == 0:
+            average_score = 0;
+        else:
+            average_score = sum(sentiment_scores) / len(sentiment_scores)
 
         # Assign sentiment label based on the average score
         if average_score > 0:
@@ -55,6 +63,7 @@ def extract_noun_phrases(text):
     return blob.noun_phrases
 
 def correct_spelling(text):
+    text = TextBlob(text)
     text.correct()
     return text
 

@@ -159,3 +159,7 @@ def create_and_save_graphs(topic: str, opinions: list[Opinion], datewise_opinion
     wordcloud.to_file('opinionminer' + wordcloud_path)
 
     return trend_graph, wordcloud_path
+
+
+def get_stats():
+    pass

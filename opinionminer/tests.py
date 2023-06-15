@@ -93,7 +93,6 @@ class OpinionTestCase(TestCase):
 
 
 
-
 class OpinionMinerTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
