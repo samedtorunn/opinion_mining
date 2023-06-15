@@ -23,28 +23,67 @@ class OpinionTestCase(TestCase):
         self.assertEqual(len(opinions), 0)  # Assuming there are no opinions in the specified date range
 
 
-        def test_get_opinions(self):
-            #check if the function gets opinions
-            topic = 'bitcoin'
-            start_date = date(2023, 1, 1)
-            end_date = date(2023, 4, 2)
+    def test_get_opinions(self):
+        #check if the function gets opinions
+        topic = 'bitcoin'
+        start_date = date(2023, 1, 1)
+        end_date = date(2023, 4, 2)
 
-            opinions = get_opinions(topic, start_date, end_date)
+        opinions = get_opinions(topic, start_date, end_date)
 
-            self.assertIsInstance(opinions, list)
-            self.assertGreaterEqual(len(opinions), 0)
-            for opinion in opinions:
-                self.assertEqual(opinion.date, start_date)
-
-        def test_get_opinions_with_more_than_one_keyword(self):
-            #check if it works if a query has more than keywords,
-            topic = 'Joe Biden'
-            start_date = date(2023, 1, 1)
-            end_date = date(2023, 4, 2)
-
-            opinions = get_opinions(topic, start_date, end_date)
-
-            self.assertIsInstance(opinions, list)
-            self.assertGreaterEqual(len(opinions), 1)
+        self.assertIsInstance(opinions, list)
+        self.assertGreaterEqual(len(opinions), 0)
 
 
+    def test_get_opinions_with_more_than_one_keyword(self):
+        #check if it works if a query has more than keywords,
+        topic = 'Joe Biden'
+        start_date = date(2023, 1, 1)
+        end_date = date(2023, 4, 2)
+
+        opinions = get_opinions(topic, start_date, end_date)
+
+        self.assertIsInstance(opinions, list)
+        self.assertGreaterEqual(len(opinions), 1)
+
+    def test_opinions_view_no_opinions(self):
+        # Test that opinions view handles no opinions found correctly
+        topic = 'NonExistentTopic'
+        start_date = date.today()
+        end_date = date.today()
+        response = self.client.get(reverse('opinions'), {
+            'query': topic,
+            'start_date': start_date,
+            'end_date': end_date,
+        })
+        self.assertTemplateUsed(response, 'opinionminer/error.html')
+
+    def test_sentiment_distribution(self):
+        # Ensure that the sentiment distribution function accurately counts sentiments
+        from .reddit_opinions import get_sentiment_distribution
+
+        opinions = [
+            Opinion(sentiment='positive'),
+            Opinion(sentiment='positive'),
+            Opinion(sentiment='negative'),
+            Opinion(sentiment='neutral'),
+        ]
+
+        distribution = get_sentiment_distribution(opinions)
+
+        self.assertEqual(distribution['positive'], 2)
+        self.assertEqual(distribution['negative'], 1)
+        self.assertEqual(distribution['neutral'], 1)
+
+    def test_get_sentiment(self):
+        # Ensure that the sentiment function correctly identifies positive, negative, and neutral sentiments.
+        from .reddit_opinions import get_sentiment
+
+        positive_text = 'This is a wonderful experience'
+        negative_text = 'This is a horrible experience'
+        neutral_text = 'This is an experience'
+
+        self.assertEqual(get_sentiment(positive_text), 'positive')
+        self.assertEqual(get_sentiment(negative_text), 'negative')
+        self.assertEqual(get_sentiment(neutral_text), 'neutral')
+        print("Sentiments are right.")
