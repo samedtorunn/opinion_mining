@@ -10,9 +10,9 @@ from .forms import QueryForm
 
 
 class OpinionTestCase(TestCase):
-    def test_get_opinions(self):
+    def test_get_opinions_from_future(self):
         # If the dates are in the future there should be no opinions.
-        topic = "Joe Biden"
+        topic = "bitcoin"
         start_date = datetime(2025, 1, 1)
         end_date = datetime(2025, 1, 7)
 
@@ -21,4 +21,30 @@ class OpinionTestCase(TestCase):
 
         # Assert the test.
         self.assertEqual(len(opinions), 0)  # Assuming there are no opinions in the specified date range
+
+
+        def test_get_opinions(self):
+            #check if the function gets opinions
+            topic = 'bitcoin'
+            start_date = date(2023, 1, 1)
+            end_date = date(2023, 4, 2)
+
+            opinions = get_opinions(topic, start_date, end_date)
+
+            self.assertIsInstance(opinions, list)
+            self.assertGreaterEqual(len(opinions), 0)
+            for opinion in opinions:
+                self.assertEqual(opinion.date, start_date)
+
+        def test_get_opinions_with_more_than_one_keyword(self):
+            #check if it works if a query has more than keywords,
+            topic = 'Joe Biden'
+            start_date = date(2023, 1, 1)
+            end_date = date(2023, 4, 2)
+
+            opinions = get_opinions(topic, start_date, end_date)
+
+            self.assertIsInstance(opinions, list)
+            self.assertGreaterEqual(len(opinions), 1)
+
 
