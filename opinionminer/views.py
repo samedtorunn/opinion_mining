@@ -112,7 +112,7 @@ def opinions_view(request):
             'trend_graph': graph_path,
             'wordcloud': wordcloud_path
         })
-    return redirect('home')
+    return redirect(reverse('home'))
 
 
 
