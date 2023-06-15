@@ -56,7 +56,11 @@
                         <button type="submit" class="btn btn-primary">Compare</button>
                     </form>
 
-                    <h2>Sentiments</h2>
+                    <div class="toggle-sentiment">
+                        <h2 class>Sentiments</h2>
+                        {% include 'sentiment_table.html' %}
+                    </div>
+
                     {% include 'sentiment_table.html' %}
 
                     <h2 class="mt-5">Trends 📊</h2>
