@@ -29,11 +29,12 @@ def get_sentiment(text):
         return 'neutral'
 
 
-def extract_noun_phrases(text):
-    doc = nlp(text)
-    noun_phrases = [chunk.text for chunk in doc.noun_chunks]
-    return noun_phrases
-
+def extract_noun_phrases():
+    gfg = TextBlob(
+        "Sandeep Jain An IIT Roorkee alumnus and founder of GeeksforGeeks. He loves to solve programming problems in most efficient ways.")
+    # using TextBlob.noun_phrases method
+    gfg = gfg.noun_phrases
+    print(gfg)
 
 def get_opinions(topic, start_date, end_date):
     opinions = []
@@ -50,10 +51,8 @@ def get_opinions(topic, start_date, end_date):
                 lang = detect(submission.title + submission.selftext)
                 if lang == 'en' and has_sentence(submission.selftext):
                     sentiment = get_sentiment(submission.title + submission.selftext)
-                    noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date())
-                    opinion.noun_phrases = noun_phrases
                     opinions.append(opinion)
     except prawcore.exceptions.Redirect:
         pass
@@ -73,10 +72,10 @@ def get_opinions(topic, start_date, end_date):
                     lang = detect(submission.title + submission.selftext)
                     if lang == 'en' and has_sentence(submission.selftext):
                         sentiment = get_sentiment(submission.title + submission.selftext)
-                        noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
+
                         opinion = Opinion(title=submission.title, text=submission.selftext,
                                           sentiment=sentiment, date=submission_time.date())
-                        opinion.noun_phrases = noun_phrases
+
                         opinions.append(opinion)
         except prawcore.exceptions.Redirect:
             pass
