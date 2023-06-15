@@ -4,6 +4,11 @@ Opinion Miner is a sentiment analysis tool that extracts opinions from social me
 
 The opinion mining tool is designed to provide insights on any topic by analyzing opinions from Reddit. The tool uses the PRAW library to access Reddit’s API, TextBlob for sentiment analysis, and Django for the web framework.
 
+## Accesibility
+
+The project can be opened and used via **[44.200.246.83:8000](44.200.246.83:8000)** address. It is dockerized and actively running on an EC2 Ubuntu instance. 
+
+
 ## Features
 
 - Fetch opinions from Reddit.
@@ -12,6 +17,7 @@ The opinion mining tool is designed to provide insights on any topic by analyzin
 - Ability to opinions based on specific topics, time intervals, and sentiment categories.
 - Support for multiple languages and customizable sentiment analysis models.
 - Easy-to-use web interface for querying and visualizing opinions.
+
 
 ## Installation
 
