@@ -13,6 +13,13 @@ from wordcloud import WordCloud
 import sklearn
 from sklearn.linear_model import LinearRegression
 from wordcloud import STOPWORDS
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.views import View
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from io import BytesIO
+
 
 
 
