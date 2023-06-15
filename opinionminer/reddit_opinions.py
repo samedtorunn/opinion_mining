@@ -44,7 +44,7 @@ def get_opinions(topic, start_date, end_date):
             submission_time = datetime.fromtimestamp(submission.created_utc)
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
-                if lang == 'en':
+                if lang == 'en' and len(submission.selftext) > 100:
                     sentiment = get_sentiment(submission.title + submission.selftext)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date())
@@ -58,7 +58,7 @@ def get_opinions(topic, start_date, end_date):
             submission_time = datetime.fromtimestamp(submission.created_utc)
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
-                if lang == 'en':
+                if lang == 'en' and len(submission.selftext) > 100:
                     sentiment = get_sentiment(submission.title + submission.selftext)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date())
