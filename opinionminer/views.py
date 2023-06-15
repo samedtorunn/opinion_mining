@@ -134,23 +134,26 @@ def opinions_view(request):
     topic = form.cleaned_data['query']
     compare_to = form.cleaned_data.get("compare_to")
 
-
     start_date = form.cleaned_data['start_date']
     end_date = form.cleaned_data['end_date']
     opinions = get_opinions(topic, start_date, end_date)
+
     # First we check if there are any opinions or not.
     if len(opinions) == 0:
         return render(request, 'opinionminer/error.html', {'message': 'No opinions found.'})
-
     else:
-
         results = [analyze_opinions(topic, opinions, start_date, end_date)]
 
         if compare_to:
-            results.append(analyze_opinions(compare_to, opinions, start_date, end_date))
+            compare_to_opinions = get_opinions(compare_to, start_date, end_date)
+            if compare_to_opinions:
+                results.append(analyze_opinions(compare_to, compare_to_opinions, start_date, end_date))
+            else:
+                return render(request, 'opinionminer/error.html', {'message': f'No opinions found for comparison topic {compare_to}.'})
 
         return render(request, 'opinionminer/opinions.html', {
             'primary_topic': topic,
             'results': results,
         })
+
 

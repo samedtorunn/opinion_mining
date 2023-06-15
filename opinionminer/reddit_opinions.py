@@ -98,8 +98,7 @@ def get_second_opinions(topic, start_date, end_date):
     start_time = datetime.combine(start_date, datetime.min.time())
     end_time = datetime.combine(end_date, datetime.max.time())
 
-    # Remove spaces and convert to lowercase
-    topic = topic.replace(" ", "").lower()
+
 
     try:
         # Retrieve posts from the general Reddit search
@@ -114,30 +113,32 @@ def get_second_opinions(topic, start_date, end_date):
                     opinions.append(opinion)
     except prawcore.exceptions.Redirect:
         pass
-
     except prawcore.exceptions.NotFound:
         # Handle subreddit not found error
         return []
 
-    try:
-        # Retrieve posts from the specified subreddit
-        for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
-            submission_time = datetime.fromtimestamp(submission.created_utc)
-            if start_time <= submission_time <= end_time:
-                lang = detect(submission.title + submission.selftext)
-                if lang == 'en' and has_sentence(submission.selftext):
-                    sentiment = get_sentiment(submission.title + submission.selftext)
-                    opinion = Opinion(title=submission.title, text=submission.selftext,
-                                      sentiment=sentiment, date=submission_time.date())
-                    opinions.append(opinion)
-    except prawcore.exceptions.Redirect:
-        pass
-    except prawcore.exceptions.NotFound:
-        # Handle subreddit not found error
-        return []
+    # Remove spaces and convert to lowercase
+    topic = topic.replace(" ", "").lower()
+
+    if subreddit_exists(topic):
+        try:
+            # Retrieve posts from the specified subreddit
+            for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
+                submission_time = datetime.fromtimestamp(submission.created_utc)
+                if start_time <= submission_time <= end_time:
+                    lang = detect(submission.title + submission.selftext)
+                    if lang == 'en' and has_sentence(submission.selftext):
+                        sentiment = get_sentiment(submission.title + submission.selftext)
+                        opinion = Opinion(title=submission.title, text=submission.selftext,
+                                          sentiment=sentiment, date=submission_time.date())
+                        opinions.append(opinion)
+        except prawcore.exceptions.Redirect:
+            pass
+        except prawcore.exceptions.NotFound:
+            print("there is no subreddit on this topic.")
+            pass
 
     return opinions
-
 
 def get_sentiment_distribution(opinions):
     distribution = {

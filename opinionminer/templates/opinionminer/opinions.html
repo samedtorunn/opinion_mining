@@ -4,8 +4,8 @@
 
 {% block body_content %}
     <body class="white-background" style="background-color: white; background-image: none">
-<!-- Navbar -->
-     <nav class="navbar navbar-expand-lg navbar-light bg-gradient-info">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-gradient-info">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">👁️ Opinion Miner</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,118 +19,95 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">About</a>
                     </li>
-                    <div class="text-right"><button class="btn btn-outline-success" onclick="window.print()">Save the Page as PDF</button></div>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
-            <div class="row">
-                <div class="col-6"><h1>Opinions on "{{ primary_topic }}"</h1></div>
-            </div>
+    <!-- Search Section -->
+    <section class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 text-center">
+                <h1 class="mb-4">Opinions on "{{ primary_topic }}"</h1>
+                <button class="btn btn-outline-success mb-4" onclick="window.print()">Save the Page as PDF</button>
 
-
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>New Search</h4>
-                    <form action="{% url 'opinions' %}" method="get" class="d-flex">
-                        <input type="text" name="query" id="query" class="form-control me-2" placeholder="Enter a query" required value="{{ topic }}">
-                        <input type="date" name="start_date" id="start_date" class="form-control me-2" required>
-                        <input type="date" name="end_date" id="end_date" class="form-control me-2" required>
-                        <button type="submit" class="btn btn-primary">Search️</button>
-                    </form>
-                </div>
-                <div class="col-md-6">
-                    <h4>Compare <b>{{ result.topic }}</b> To another topic for given date</h4>
-                    <form action="{% url 'opinions' %}" method="get" class="d-flex">
-                    <input type="text" name="compare_to" class="form-control me-2" placeholder="Enter a query" required>
-                    <input type="hidden" name="start_date" value="{{ result.start_date|date:"Y-m-d"  }}">
-                    <input type="hidden" name="end_date" value="{{ result.end_date|date:"Y-m-d"  }}">
-                    <input type="hidden" name="query" value="{{ result.topic }}">
-                    <button type="submit" class="btn btn-warning">Compare</button>
+                <h4>Start New Search</h4>
+                <form action="{% url 'opinions' %}" method="get" class="d-flex justify-content-center">
+                    <input type="text" name="query" id="query" class="form-control me-2" placeholder="Enter a topic" required value="{{ topic }}">
+                    <input type="date" name="start_date" id="start_date" class="form-control me-2" required>
+                    <input type="date" name="end_date" id="end_date" class="form-control me-2" required>
+                    <button type="submit" class="btn btn-primary">Search️</button>
                 </form>
             </div>
-            </div>
-    </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
     {% for result in results %}
-    <div class="container mt-5">
+        <section class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-10 text-center">
+                    <h4>Compare <b>{{ result.topic }}</b> To Another Topic</h4>
+                    <form action="{% url 'opinions' %}" method="get" class="d-flex justify-content-center mb-5">
+                        <input type="text" name="compare_to" class="form-control me-2" placeholder="Enter a comparison topic" required>
+                        <input type="hidden" name="start_date" value="{{ result.start_date|date:"Y-m-d"  }}">
+                        <input type="hidden" name="end_date" value="{{ result.end_date|date:"Y-m-d"  }}">
+                        <input type="hidden" name="query" value="{{ result.topic }}">
+                        <button type="submit" class="btn btn-primary">Compare</button>
+                    </form>
 
-
-        <!-- Trends section -->
-
-        <div class="container mt-5">
-            <div class="row">
-                <div class="col-md-2">
                     <h2>Sentiments</h2>
-                </div>
+                    {% include 'sentiment_table.html' %}
 
-            </div>
-
-        {% include 'sentiment_table.html' %}
-        </div>
-
-        <div class="container mt-5">
-            <div class="row">
-                <div class="col-md-2">
-
-
-                    <h2>Trends 📊</h2>
-                </div>
-
-            </div>
-            <div id="opinion-trends" class="trends-section">
-                <img src="{{ result.trend_graph }}" alt="Trend Graph">
-            </div>
-        </div>
-
-        <br>
-        <hr>
-        <!-- Word Cloud section -->
-        <div class="container mt-5">
-            <h2>Word Cloud ☁️</h2>
-            <div id="word-cloud">
-                <img src="{{ result.wordcloud_path }}" alt="Word Cloud">
-            </div>
-        </div>
-
-        <br>
-        <hr>
-        <br>
-    <div class="container mt-5">
-        <div class="row">
-                <div class="col-md-2">
-                    <h2>Posts 🤔</h2>
-                </div>
-        </div>
-    </div>
-        {% if result.opinions %}
-            <div class="row">
-                {% for opinion in result.opinions %}
-                    <div class="col-md-4">
-                        <div class="card mb-4 box-shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ opinion.title }}</h5>
-                                {% if opinion.text %}
-                                    <p class="card-text">
-                                        {% if opinion.text|length > 100 %}
-                                            {{ opinion.text|slice:":100" }}...
-                                        {% else %}
-                                            {{ opinion.text }}
-                                        {% endif %}
-                                    </p>
-                                {% endif %}
-                                <p class="card-text"><small class="text-muted">Sentiment: {{ opinion.sentiment }}</small></p>
-                            </div>
-                        </div>
+                    <h2 class="mt-5">Trends 📊</h2>
+                    <div id="opinion-trends" class="trends-section">
+                        <img src="{{ result.trend_graph }}" alt="Trend Graph" class="img-fluid">
                     </div>
-                {% endfor %}
-            </div>
 
-        {% else %}
-            <p>No opinions found for "{{ result.topic }}".</p>
-        {% endif %}
-    </div>
+                    <hr class="mt-5 toggle-section" >
+
+                    <!-- Word Cloud Section -->
+                    <h2 class="toggle-section">Word Cloud ☁️</h2>
+                    <div id="word-cloud" class="toggle-section">
+                        <img src="{{ result.wordcloud_path }}" alt="Word Cloud" class="img-fluid">
+                    </div>
+
+                    <hr class="mt-5 toggle-section">
+
+                    <!-- Posts Section -->
+                    <h2 class="toggle-section">Posts 🤔</h2>
+                    <div id="posts-section" class="toggle-section">
+                        {% if result.opinions %}
+                            <div class="row justify-content-center">
+                                {% for opinion in result.opinions %}
+                                    <div class="col-md-6">
+                                        <div class="card mb-4 box-shadow">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ opinion.title }}</h5>
+                                                {% if opinion.text %}
+                                                    <p class="card-text">
+                                                        {% if opinion.text|length > 100 %}
+                                                            {{ opinion.text|slice:":100" }}...
+                                                        {% else %}
+                                                            {{ opinion.text }}
+                                                        {% endif %}
+                                                    </p>
+                                                {% endif %}
+                                                <p class="card-text"><small class="text-muted">Sentiment: {{ opinion.sentiment }}</small></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No opinions found for "{{ result.topic }}".</p>
+                        {% endif %}
+                    </div>
+                    <button id="toggle-button" class="btn btn-primary mt-4">Toggle Word Cloud & Posts</button>
+
+                </div>
+            </div>
+        </section>
     {% endfor %}
 
     <script>
@@ -138,12 +115,14 @@
             // Hide the trends graph initially
             $(".trends-graph").hide();
 
-            // Toggle the trends graph when the button is clicked
-            $("#toggle-trends").click(function() {
-                $(".trends-graph").toggle();
+            // Toggle the word cloud and posts sections when the button is clicked
+            $("#toggle-button").click(function() {
+                $(".toggle-section").toggle();
             });
         });
     </script>
 
+
     </body>
+
 {% endblock %}
