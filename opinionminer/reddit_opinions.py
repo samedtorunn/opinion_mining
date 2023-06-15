@@ -7,7 +7,6 @@ from langdetect import detect
 import prawcore
 
 
-
 # Creative_Intern7785
 
 
@@ -15,6 +14,7 @@ import prawcore
 reddit = praw.Reddit(client_id=client_id,
                      client_secret=secret_key,
                      user_agent='My first App for Opinion Mining')
+
 
 def get_sentiment(text):
     blob = TextBlob(text)
@@ -27,7 +27,6 @@ def get_sentiment(text):
     else:
         return 'neutral'
 
-import prawcore
 
 def get_opinions(topic, start_date, end_date):
     opinions = []
@@ -36,42 +35,8 @@ def get_opinions(topic, start_date, end_date):
     start_time = datetime.combine(start_date, datetime.min.time())
     end_time = datetime.combine(end_date, datetime.max.time())
 
-    try:
-        # Retrieve posts from the general Reddit search
-        for submission in reddit.subreddit('all').search(topic, time_filter='all'):
-            submission_time = datetime.fromtimestamp(submission.created_utc)
-            if start_time <= submission_time <= end_time:
-                lang = detect(submission.title + submission.selftext)
-                if lang == 'en':
-                    sentiment = get_sentiment(submission.title + submission.selftext)
-                    opinion = Opinion(title=submission.title, text=submission.selftext,
-                                      sentiment=sentiment, date=submission_time.date())
-                    opinions.append(opinion)
-    except prawcore.exceptions.Redirect:
-        pass
-
-    try:
-        # Retrieve posts from the specified subreddit
-        for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
-            submission_time = datetime.fromtimestamp(submission.created_utc)
-            if start_time <= submission_time <= end_time:
-                lang = detect(submission.title + submission.selftext)
-                if lang == 'en':
-                    sentiment = get_sentiment(submission.title + submission.selftext)
-                    opinion = Opinion(title=submission.title, text=submission.selftext,
-                                      sentiment=sentiment, date=submission_time.date())
-                    opinions.append(opinion)
-    except prawcore.exceptions.Redirect:
-        pass
-
-    return opinions
-
-def get_second_opinions(topic, start_date, end_date):
-    opinions = []
-
-    # Convert start_date and end_date to datetime objects
-    start_time = datetime.combine(start_date, datetime.min.time())
-    end_time = datetime.combine(end_date, datetime.max.time())
+    # Remove spaces and convert to lowercase
+    topic = topic.replace(" ", "").lower()
 
     try:
         # Retrieve posts from the general Reddit search
@@ -102,8 +67,6 @@ def get_second_opinions(topic, start_date, end_date):
         pass
 
     return opinions
-
-
 
 
 def get_sentiment_distribution(opinions):
@@ -120,26 +83,3 @@ def get_sentiment_distribution(opinions):
         elif opinion.sentiment == 'negative':
             distribution['negative'] += 1
     return distribution
-
-
-
-# Only for subreddit posts.
-
-# def get_subreddit_opinions(subreddit, start_date, end_date):
-#     opinions = []
-#
-#     start_time = datetime.combine(start_date, datetime.min.time())
-#     end_time = datetime.combine(end_date, datetime.max.time())
-#
-#     for submission in reddit.subreddit(subreddit).search(subreddit, time_filter='all'):
-#         submission_time = datetime.fromtimestamp(submission.created_utc)
-#         if start_time <= submission_time <= end_time:
-#             lang = detect(submission.title + submission.selftext)
-#             if lang == 'en':
-#                 sentiment = get_sentiment(submission.title + submission.selftext)
-#                 opinion = Opinion(title=submission.title, text=submission.selftext,
-#                                   sentiment=sentiment, date=submission_time.date())
-#                 opinions.append(opinion)
-#
-#     return opinions
-
