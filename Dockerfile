@@ -25,6 +25,9 @@ RUN pip install pillow
 
 RUN pip install -r requirements.txt
 
+# Download TextBlob corpora
+RUN python -m textblob.download_corpora
+
 # Copy the current directory contents into the container at /code/
 #COPY . /code/
 

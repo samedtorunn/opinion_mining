@@ -28,13 +28,38 @@ def get_sentiment(text):
     else:
         return 'neutral'
 
+def get_sentiment_for_noun_phrases_array(noun_phrases):
+        sentiment_scores = []
 
-def extract_noun_phrases():
-    gfg = TextBlob(
-        "Sandeep Jain An IIT Roorkee alumnus and founder of GeeksforGeeks. He loves to solve programming problems in most efficient ways.")
-    # using TextBlob.noun_phrases method
-    gfg = gfg.noun_phrases
-    print(gfg)
+        for phrase in noun_phrases:
+            blob = TextBlob(phrase)
+            sentiment_score = blob.sentiment.polarity
+            sentiment_scores.append(sentiment_score)
+
+        # Calculate the overall sentiment based on the average score
+        average_score = sum(sentiment_scores) / len(sentiment_scores)
+
+        # Assign sentiment label based on the average score
+        if average_score > 0:
+            sentiment = 'positive'
+        elif average_score < 0:
+            sentiment = 'negative'
+        else:
+            sentiment = 'neutral'
+
+        return sentiment
+
+
+def extract_noun_phrases(text):
+    blob = TextBlob(text)
+    return blob.noun_phrases
+
+def correct_spelling(text):
+    text.correct()
+    return text
+
+
+
 
 def get_opinions(topic, start_date, end_date):
     opinions = []
@@ -50,9 +75,13 @@ def get_opinions(topic, start_date, end_date):
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
                 if lang == 'en' and has_sentence(submission.selftext):
-                    sentiment = get_sentiment(submission.title + submission.selftext)
+                    correct_spelling(submission.title)
+                    correct_spelling(submission.selftext)
+                    noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
+                    sentiment = get_sentiment_for_noun_phrases_array(noun_phrases)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
-                                      sentiment=sentiment, date=submission_time.date())
+                                      sentiment=sentiment, date=submission_time.date(),
+                                      )
                     opinions.append(opinion)
     except prawcore.exceptions.Redirect:
         pass
@@ -71,11 +100,13 @@ def get_opinions(topic, start_date, end_date):
                 if start_time <= submission_time <= end_time:
                     lang = detect(submission.title + submission.selftext)
                     if lang == 'en' and has_sentence(submission.selftext):
-                        sentiment = get_sentiment(submission.title + submission.selftext)
-
+                        correct_spelling(submission.title)
+                        correct_spelling(submission.selftext)
+                        noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
+                        sentiment = get_sentiment_for_noun_phrases_array(noun_phrases)
                         opinion = Opinion(title=submission.title, text=submission.selftext,
-                                          sentiment=sentiment, date=submission_time.date())
-
+                                          sentiment=sentiment, date=submission_time.date(),
+                                          )
                         opinions.append(opinion)
         except prawcore.exceptions.Redirect:
             pass

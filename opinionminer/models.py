@@ -9,6 +9,7 @@ class Opinion(models.Model):
     comments = models.TextField(null=True, blank=True)
     likes = models.IntegerField(default=0, blank=True, null=True)
 
+
     def __str__(self):
         return f"{self.title} ({self.sentiment})"
 
