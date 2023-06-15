@@ -5,6 +5,9 @@ from .models import Opinion
 from datetime import datetime
 from langdetect import detect
 import prawcore
+import spacy
+
+nlp = spacy.load('en_core_web_sm')
 
 
 # Creative_Intern7785
@@ -44,7 +47,7 @@ def get_opinions(topic, start_date, end_date):
             submission_time = datetime.fromtimestamp(submission.created_utc)
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
-                if lang == 'en' and len(submission.selftext) > 100:
+                if lang == 'en' and has_sentence(submission.selftext):
                     sentiment = get_sentiment(submission.title + submission.selftext)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date())
@@ -62,7 +65,7 @@ def get_opinions(topic, start_date, end_date):
             submission_time = datetime.fromtimestamp(submission.created_utc)
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
-                if lang == 'en' and len(submission.selftext) > 100:
+                if lang == 'en' and has_sentence(submission.selftext):
                     sentiment = get_sentiment(submission.title + submission.selftext)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date())
@@ -90,3 +93,7 @@ def get_sentiment_distribution(opinions):
         elif opinion.sentiment == 'negative':
             distribution['negative'] += 1
     return distribution
+
+def has_sentence(text):
+    doc = nlp(text)
+    return any(sent.text.strip() for sent in doc.sents)
