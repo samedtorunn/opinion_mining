@@ -2,7 +2,7 @@ from django.shortcuts import render
 import praw
 from textblob import TextBlob
 from .models import Opinion
-from datetime import datetime, timedelta
+from datetime import datetime
 from langdetect import detect
 import prawcore
 
@@ -52,6 +52,10 @@ def get_opinions(topic, start_date, end_date):
     except prawcore.exceptions.Redirect:
         pass
 
+    except prawcore.exceptions.NotFound:
+        # Handle subreddit not found error
+        return []
+
     try:
         # Retrieve posts from the specified subreddit
         for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
@@ -65,6 +69,9 @@ def get_opinions(topic, start_date, end_date):
                     opinions.append(opinion)
     except prawcore.exceptions.Redirect:
         pass
+    except prawcore.exceptions.NotFound:
+        # Handle subreddit not found error
+        return []
 
     return opinions
 
