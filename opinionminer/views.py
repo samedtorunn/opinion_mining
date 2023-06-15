@@ -3,7 +3,6 @@ from .reddit_opinions import get_opinions, get_sentiment_distribution
 from .forms import QueryForm
 from .models import Opinion
 from django.urls import reverse
-import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import matplotlib
 matplotlib.use('Agg')
@@ -13,14 +12,6 @@ from wordcloud import WordCloud
 import sklearn
 from sklearn.linear_model import LinearRegression
 from wordcloud import STOPWORDS
-from django.http import HttpResponse
-from django.template.loader import get_template
-from django.views import View
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from io import BytesIO
-
-
 
 
 def home_view(request):
@@ -35,14 +26,13 @@ def opinions_view(request):
         end_date = form.cleaned_data['end_date']
         opinions = get_opinions(topic, start_date, end_date)
 
+        # First we check if there are any opinions or not.
         if len(opinions) == 0:
             return render(request, 'opinionminer/error.html', {'message': 'No opinions found.'})
 
         else:
 
             sentiment_distribution = get_sentiment_distribution(opinions)
-
-
 
             # Calculate daily trends
             datewise_opinions = {}
