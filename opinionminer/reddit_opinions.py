@@ -9,9 +9,7 @@ import spacy
 
 nlp = spacy.load('en_core_web_sm')
 
-
 # Creative_Intern7785
-
 
 
 reddit = praw.Reddit(client_id=client_id,
@@ -31,6 +29,10 @@ def get_sentiment(text):
         return 'neutral'
 
 
+def extract_noun_phrases(text):
+    doc = nlp(text)
+    noun_phrases = [chunk.text for chunk in doc.noun_chunks]
+    return noun_phrases
 
 
 def get_opinions(topic, start_date, end_date):
@@ -40,8 +42,6 @@ def get_opinions(topic, start_date, end_date):
     start_time = datetime.combine(start_date, datetime.min.time())
     end_time = datetime.combine(end_date, datetime.max.time())
 
-
-
     try:
         # Retrieve posts from the general Reddit search
         for submission in reddit.subreddit('all').search(topic, time_filter='all'):
@@ -50,8 +50,10 @@ def get_opinions(topic, start_date, end_date):
                 lang = detect(submission.title + submission.selftext)
                 if lang == 'en' and has_sentence(submission.selftext):
                     sentiment = get_sentiment(submission.title + submission.selftext)
+                    noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date())
+                    opinion.noun_phrases = noun_phrases
                     opinions.append(opinion)
     except prawcore.exceptions.Redirect:
         pass
@@ -71,8 +73,10 @@ def get_opinions(topic, start_date, end_date):
                     lang = detect(submission.title + submission.selftext)
                     if lang == 'en' and has_sentence(submission.selftext):
                         sentiment = get_sentiment(submission.title + submission.selftext)
+                        noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                         opinion = Opinion(title=submission.title, text=submission.selftext,
                                           sentiment=sentiment, date=submission_time.date())
+                        opinion.noun_phrases = noun_phrases
                         opinions.append(opinion)
         except prawcore.exceptions.Redirect:
             pass
@@ -81,6 +85,7 @@ def get_opinions(topic, start_date, end_date):
             pass
 
     return opinions
+
 
 def subreddit_exists(subreddit):
     exists = True
@@ -98,8 +103,6 @@ def get_second_opinions(topic, start_date, end_date):
     start_time = datetime.combine(start_date, datetime.min.time())
     end_time = datetime.combine(end_date, datetime.max.time())
 
-
-
     try:
         # Retrieve posts from the general Reddit search
         for submission in reddit.subreddit('all').search(topic, time_filter='all'):
@@ -108,8 +111,10 @@ def get_second_opinions(topic, start_date, end_date):
                 lang = detect(submission.title + submission.selftext)
                 if lang == 'en' and has_sentence(submission.selftext):
                     sentiment = get_sentiment(submission.title + submission.selftext)
+                    noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date())
+                    opinion.noun_phrases = noun_phrases
                     opinions.append(opinion)
     except prawcore.exceptions.Redirect:
         pass
@@ -129,8 +134,10 @@ def get_second_opinions(topic, start_date, end_date):
                     lang = detect(submission.title + submission.selftext)
                     if lang == 'en' and has_sentence(submission.selftext):
                         sentiment = get_sentiment(submission.title + submission.selftext)
+                        noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                         opinion = Opinion(title=submission.title, text=submission.selftext,
                                           sentiment=sentiment, date=submission_time.date())
+                        opinion.noun_phrases = noun_phrases
                         opinions.append(opinion)
         except prawcore.exceptions.Redirect:
             pass
@@ -139,6 +146,7 @@ def get_second_opinions(topic, start_date, end_date):
             pass
 
     return opinions
+
 
 def get_sentiment_distribution(opinions):
     distribution = {
@@ -154,6 +162,7 @@ def get_sentiment_distribution(opinions):
         elif opinion.sentiment == 'negative':
             distribution['negative'] += 1
     return distribution
+
 
 def has_sentence(text):
     doc = nlp(text)
