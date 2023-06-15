@@ -11,8 +11,7 @@ nlp = spacy.load('en_core_web_sm')
 
 
 # Creative_Intern7785
-secret_key = "GifgZ1mzRY82gHodCoJU-NYDhQBuOQ"
-client_id = "d6A-_nqpbKUnJU9E5jYpWQ"
+
 
 
 reddit = praw.Reddit(client_id=client_id,
