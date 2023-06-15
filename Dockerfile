@@ -28,6 +28,10 @@ RUN pip install -r requirements.txt
 # Download TextBlob corpora
 RUN python -m textblob.download_corpora
 
+
+# Download Spacy
+RUN python -m spacy download en_core_web_sm
+
 # Copy the current directory contents into the container at /code/
 #COPY . /code/
 

@@ -124,9 +124,9 @@ def create_and_save_graphs(topic: str, opinions: list[Opinion], datewise_opinion
     colors = ['lightgray', 'green', 'red']
 
     # Plot trend lines
-    plt.plot(dates, positive_counts, label='Positive', color=colors[1], linewidth=3)
-    plt.plot(dates, neutral_counts, label='Neutral', color=colors[0], linewidth=3)
-    plt.plot(dates, negative_counts, label='Negative', color=colors[2], linewidth=3)
+    plt.plot(dates, positive_counts, label='Positive', color=colors[1], linewidth=2)
+    plt.plot(dates, neutral_counts, label='Neutral', color=colors[0], linewidth=1)
+    plt.plot(dates, negative_counts, label='Negative', color=colors[2], linewidth=2)
 
     for sentiment, regression_line in regression_lines.items():
         y_pred = regression_line.predict(x)

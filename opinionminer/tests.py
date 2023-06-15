@@ -1,15 +1,34 @@
 from django.test import TestCase
-from datetime import datetime, timedelta
-from .reddit_opinions import get_opinions
-from django.test import TestCase
+from datetime import datetime
 from django.urls import reverse
 from datetime import date
 from .models import Opinion
 from .reddit_opinions import get_opinions, get_sentiment_distribution
 from .forms import QueryForm
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory
 from django.urls import reverse
 from .views import home_view, opinions_view
+from textblob import TextBlob
+from .reddit_opinions import extract_noun_phrases, correct_spelling
+
+
+
+class TextProcessingTestCase(TestCase):
+    def test_extract_noun_phrases(self):
+        text = "I love eating pizza in New York City"
+        expected_noun_phrases = ['eating pizza', 'new york city']
+
+        result = extract_noun_phrases(text)
+
+        self.assertEqual(result, expected_noun_phrases)
+
+    def test_correct_spelling(self):
+        text = "I lvoe eatnig tomatois in New York City"
+        expected_corrected_text = "I love eating pizza in New York City"
+
+        result = correct_spelling(text)
+
+        self.assertEqual(result, expected_corrected_text)
 
 
 class OpinionTestCase(TestCase):
