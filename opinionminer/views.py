@@ -55,6 +55,7 @@ def analyze_opinions(topic: str, opinions: list[Opinion], start_date, end_date):
     for opinion in opinions:
         opinion_date = opinion.date
         sentiment = opinion.sentiment
+        link = opinion.link
         datewise_opinions[opinion_date][sentiment] += 1
 
     trend_graph, wordcloud_path = create_and_save_graphs(topic, opinions, datewise_opinions, start_date, end_date)
@@ -66,7 +67,8 @@ def analyze_opinions(topic: str, opinions: list[Opinion], start_date, end_date):
         'trend_graph': trend_graph,
         'wordcloud_path': wordcloud_path,
         'start_date': start_date,
-        'end_date': end_date
+        'end_date': end_date,
+        'link': link
     }
 
 
@@ -76,6 +78,8 @@ def opinions_view(request):
         print(form.errors)
         return redirect('home')
 
+
+    comparison_made = False
     topic = form.cleaned_data['query']
     compare_to = form.cleaned_data.get("compare_to")
 
@@ -90,15 +94,18 @@ def opinions_view(request):
         results = [analyze_opinions(topic, opinions, start_date, end_date)]
 
         if compare_to:
+
             compare_to_opinions = get_opinions(compare_to, start_date, end_date)
             if compare_to_opinions:
                 results.append(analyze_opinions(compare_to, compare_to_opinions, start_date, end_date))
+                comparison_made = True
             else:
                 return render(request, 'opinionminer/error.html', {'message': f'No opinions found for comparison topic {compare_to}.'})
 
         return render(request, 'opinionminer/opinions.html', {
             'primary_topic': topic,
             'results': results,
+            'comparison_made': comparison_made,
         })
 
 
@@ -161,5 +168,4 @@ def create_and_save_graphs(topic: str, opinions: list[Opinion], datewise_opinion
     return trend_graph, wordcloud_path
 
 
-def get_stats():
-    pass
+

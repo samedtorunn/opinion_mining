@@ -83,7 +83,7 @@
                                     <div class="col-md-6">
                                         <div class="card mb-4 box-shadow">
                                             <div class="card-body">
-                                                <h5 class="card-title">{{ opinion.title }}</h5>
+                                                <h5 class="card-title" ><a href={{ opinion.link }} target="_blank">{{ opinion.title }}</a></h5>
                                                 {% if opinion.text %}
                                                     <p class="card-text">
                                                         {% if opinion.text|length > 100 %}
@@ -103,6 +103,7 @@
                             <p>No opinions found for "{{ result.topic }}".</p>
                         {% endif %}
                     </div>
+
                     <button id="toggle-button" class="btn btn-primary mt-4">Toggle Word Cloud & Posts</button>
 
                 </div>
@@ -121,8 +122,6 @@
             });
         });
     </script>
-
-
     </body>
 
 {% endblock %}

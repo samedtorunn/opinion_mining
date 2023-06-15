@@ -98,8 +98,9 @@ def get_opinions(topic, start_date, end_date):
                     correct_spelling(submission.selftext)
                     noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                     sentiment = get_sentiment_for_noun_phrases_array(noun_phrases)
+                    print(submission.url)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
-                                      sentiment=sentiment, date=submission_time.date(),
+                                      sentiment=sentiment, date=submission_time.date(), link=submission.url
                                       )
                     opinions.append(opinion)
     except prawcore.exceptions.Redirect:

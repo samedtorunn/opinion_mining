@@ -52,7 +52,6 @@ exceptiongroup==1.1.1
 filelock==3.12.0
 flake8==3.6.0
 fonttools==4.39.4
-GDAL==3.6.4
 h11==0.14.0
 html5lib==1.1
 idna==3.4
