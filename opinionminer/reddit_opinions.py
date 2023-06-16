@@ -33,34 +33,34 @@ def get_sentiment(text):
 
 
 def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
-        sentiment_scores = []
-        for phrase in noun_phrases:
-            blob = TextBlob(phrase)
-            sentiment_score = blob.sentiment.polarity
-            sentiment_subjectivity = blob.sentiment.subjectivity
+    sentiment_scores = []
+    for phrase in noun_phrases:
+        blob = TextBlob(phrase)
+        sentiment_score = blob.sentiment.polarity
+        sentiment_subjectivity = blob.sentiment.subjectivity
 
-            # To get more sharp results, subjectivity is increased.
-            if sentiment_subjectivity >= 0.7:
-                sentiment_scores.append(sentiment_score)
+        # To get more sharp results, subjectivity is increased.
+        if sentiment_subjectivity >= 0.7:
+            sentiment_scores.append(sentiment_score)
 
-        # Add emoji scores to the sentiment scores
-        sentiment_scores.extend(emoji_scores)
+    # Add emoji scores to the sentiment scores
+    sentiment_scores.extend(emoji_scores)
 
-        # Calculate the overall sentiment based on the average score
-        if len(sentiment_scores) == 0:
-            average_score = 0;
-        else:
-            average_score = sum(sentiment_scores) / len(sentiment_scores)
+    # Calculate the overall sentiment based on the average score
+    if len(sentiment_scores) == 0:
+        average_score = 0;
+    else:
+        average_score = sum(sentiment_scores) / len(sentiment_scores)
 
-        # Assign sentiment label based on the average score
-        if average_score > 0:
-            sentiment = 'positive'
-        elif average_score < 0:
-            sentiment = 'negative'
-        else:
-            sentiment = 'neutral'
+    # Assign sentiment label based on the average score
+    if average_score > 0:
+        sentiment = 'positive'
+    elif average_score < 0:
+        sentiment = 'negative'
+    else:
+        sentiment = 'neutral'
 
-        return sentiment
+    return sentiment
 
 # Since the accuracy of TextBlob is not satisfying after a few trials, I stopped using TextBlob, I started using
 #Spacy. The function right below is not used anymore.
@@ -85,6 +85,7 @@ def correct_spelling(text):
 
 def get_opinions(topic, start_date, end_date):
     opinions = []
+    fetched_opinions = set()  # Set to store unique opinion identifiers
 
     # Convert start_date and end_date to datetime objects
     start_time = datetime.combine(start_date, datetime.min.time())
@@ -97,15 +98,18 @@ def get_opinions(topic, start_date, end_date):
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
                 if lang == 'en' and has_sentence(submission.selftext):
-                    emoji_list = emoji_scoring(submission.title + submission.selftext)
-                    correct_spelling(submission.title)
-                    correct_spelling(submission.selftext)
-                    noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
-                    sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
-                    opinion = Opinion(title=submission.title, text=submission.selftext,
-                                      sentiment=sentiment, date=submission_time.date(), link=submission.url
-                                      )
-                    opinions.append(opinion)
+                    opinion_id = submission.id  # Get unique identifier of the opinion
+                    if opinion_id not in fetched_opinions:
+                        fetched_opinions.add(opinion_id)  # Add opinion identifier to set
+                        emoji_list = emoji_scoring(submission.title + submission.selftext)
+                        correct_spelling(submission.title)
+                        correct_spelling(submission.selftext)
+                        noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
+                        sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
+                        opinion = Opinion(title=submission.title, text=submission.selftext,
+                                          sentiment=sentiment, date=submission_time.date(), link=submission.url
+                                          )
+                        opinions.append(opinion)
     except prawcore.exceptions.Redirect:
         pass
     except prawcore.exceptions.NotFound:
@@ -123,29 +127,35 @@ def get_opinions(topic, start_date, end_date):
                 if start_time <= submission_time <= end_time:
                     lang = detect(submission.title + submission.selftext)
                     if lang == 'en' and has_sentence(submission.selftext):
-                        emoji_list = emoji_scoring(submission.title + submission.selftext)
-                        correct_spelling(submission.title)
-                        correct_spelling(submission.selftext)
-                        noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
-                        sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
-                        opinion = Opinion(title=submission.title, text=submission.selftext,
-                                          sentiment=sentiment, date=submission_time.date(),
-                                          )
-                        opinions.append(opinion)
+                        opinion_id = submission.id  # Get unique identifier of the opinion
+                        if opinion_id not in fetched_opinions:
+                            fetched_opinions.add(opinion_id)  # Add opinion identifier to set
+                            emoji_list = emoji_scoring(submission.title + submission.selftext)
+                            correct_spelling(submission.title)
+                            correct_spelling(submission.selftext)
+                            noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
+                            sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
+                            opinion = Opinion(title=submission.title, text=submission.selftext,
+                                              sentiment=sentiment, date=submission_time.date(),
+                                              )
+                            opinions.append(opinion)
         except prawcore.exceptions.Redirect:
             pass
         except prawcore.exceptions.NotFound:
             pass
 
-        topic = topic.replace(" ", "_").lower()
-        if subreddit_exists(topic):
-            try:
-                # Retrieve posts from the specified subreddit
-                for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
-                    submission_time = datetime.fromtimestamp(submission.created_utc)
-                    if start_time <= submission_time <= end_time:
-                        lang = detect(submission.title + submission.selftext)
-                        if lang == 'en' and has_sentence(submission.selftext):
+    topic = topic.replace(" ", "_").lower()
+    if subreddit_exists(topic):
+        try:
+            # Retrieve posts from the specified subreddit
+            for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
+                submission_time = datetime.fromtimestamp(submission.created_utc)
+                if start_time <= submission_time <= end_time:
+                    lang = detect(submission.title + submission.selftext)
+                    if lang == 'en' and has_sentence(submission.selftext):
+                        opinion_id = submission.id  # Get unique identifier of the opinion
+                        if opinion_id not in fetched_opinions:
+                            fetched_opinions.add(opinion_id)  # Add opinion identifier to set
                             emoji_list = emoji_scoring(submission.title + submission.selftext)
                             correct_spelling(submission.title)
                             correct_spelling(submission.selftext)
@@ -155,35 +165,15 @@ def get_opinions(topic, start_date, end_date):
                                               sentiment=sentiment, date=submission_time.date(),
                                               )
                             opinions.append(opinion)
-            except prawcore.exceptions.Redirect:
-                pass
-            except prawcore.exceptions.NotFound:
-                pass
+        except prawcore.exceptions.Redirect:
+            pass
+        except prawcore.exceptions.NotFound:
+            pass
 
-        topic = topic.replace(" ", "_").lower()
-        if subreddit_exists(topic):
-            try:
-                # Retrieve posts from the specified subreddit
-                for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
-                    submission_time = datetime.fromtimestamp(submission.created_utc)
-                    if start_time <= submission_time <= end_time:
-                        lang = detect(submission.title + submission.selftext)
-                        if lang == 'en' and has_sentence(submission.selftext):
-                            emoji_list = emoji_scoring(submission.title + submission.selftext)
-                            correct_spelling(submission.title)
-                            correct_spelling(submission.selftext)
-                            noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
-                            sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
-                            opinion = Opinion(title=submission.title, text=submission.selftext,
-                                              sentiment=sentiment, date=submission_time.date(),
-                                              )
-                            opinions.append(opinion)
-            except prawcore.exceptions.Redirect:
-                pass
-            except prawcore.exceptions.NotFound:
-                pass
+
 
     return opinions
+
 
 
 
