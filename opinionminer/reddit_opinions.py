@@ -9,7 +9,6 @@ import spacy
 import re
 import csv
 
-
 nlp = spacy.load('en_core_web_sm')
 
 # Creative_Intern7785
@@ -61,9 +60,7 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         else:
             sentiment = 'neutral'
 
-        print(average_score)
         return sentiment
-
 
 # Since the accuracy of TextBlob is not satisfying after a few trials, I stopped using TextBlob, I started using
 #Spacy. The function right below is not used anymore.
@@ -100,7 +97,6 @@ def get_opinions(topic, start_date, end_date):
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
                 if lang == 'en' and has_sentence(submission.selftext):
-                    print(get_emojis(submission.selftext))
                     emoji_list = emoji_scoring(submission.title + submission.selftext)
                     correct_spelling(submission.title)
                     correct_spelling(submission.selftext)
@@ -128,8 +124,6 @@ def get_opinions(topic, start_date, end_date):
                     lang = detect(submission.title + submission.selftext)
                     if lang == 'en' and has_sentence(submission.selftext):
                         emoji_list = emoji_scoring(submission.title + submission.selftext)
-
-                        print(get_emojis(submission.selftext))
                         correct_spelling(submission.title)
                         correct_spelling(submission.selftext)
                         noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
@@ -141,7 +135,6 @@ def get_opinions(topic, start_date, end_date):
         except prawcore.exceptions.Redirect:
             pass
         except prawcore.exceptions.NotFound:
-            print("there is no subreddit on this topic.")
             pass
 
         topic = topic.replace(" ", "_").lower()
@@ -165,7 +158,6 @@ def get_opinions(topic, start_date, end_date):
             except prawcore.exceptions.Redirect:
                 pass
             except prawcore.exceptions.NotFound:
-                print("there is no subreddit on this topic.")
                 pass
 
         topic = topic.replace(" ", "_").lower()
@@ -189,7 +181,6 @@ def get_opinions(topic, start_date, end_date):
             except prawcore.exceptions.Redirect:
                 pass
             except prawcore.exceptions.NotFound:
-                print("there is no subreddit on this topic.")
                 pass
 
     return opinions
@@ -221,11 +212,9 @@ def get_sentiment_distribution(opinions):
             distribution['negative'] += 1
     return distribution
 
-
 def has_sentence(text):
     doc = nlp(text)
     return any(sent.text.strip() for sent in doc.sents)
-
 
 def is_emoji(s):
     emojis = re.findall(r'[^\w\s,]', s)
@@ -234,11 +223,9 @@ def is_emoji(s):
             return True
     return False
 
-
-
 emoji_sentiment_dict = {}
 
-with open('/Users/samed.torun/Desktop/opinion_mining/opinionminer/Emoji_Sentiment_Data_v1.0.csv', newline='', encoding='utf-8') as csvfile:
+with open('opinionminer/Emoji_Sentiment_Data_v1.0.csv', newline='', encoding='utf-8') as csvfile:
 
     reader = csv.DictReader(csvfile)
     for row in reader:
