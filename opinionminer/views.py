@@ -87,6 +87,7 @@ def opinions_view(request):
     end_date = form.cleaned_data['end_date']
     opinions = get_opinions(topic, start_date, end_date)
 
+
     # First we check if there are any opinions or not.
     if len(opinions) == 0:
         return render(request, 'opinionminer/error.html', {'message': 'No opinions found.'})

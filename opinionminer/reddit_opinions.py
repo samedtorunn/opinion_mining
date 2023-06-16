@@ -69,10 +69,13 @@ def extract_noun_phrases_with_TextBlob(text):
     return blob.noun_phrases
 
 def extract_noun_phrases(text):
+    text = text.lower()  #lowering the text characters
     doc = nlp(text)
     noun_phrases = []
     for chunk in doc.noun_chunks:
         noun_phrases.append(chunk.text)
+
+    print(noun_phrases)
     return noun_phrases
 
 
@@ -105,9 +108,10 @@ def get_opinions(topic, start_date, end_date):
                         correct_spelling(submission.title)
                         correct_spelling(submission.selftext)
                         noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
-                        sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
+                        sentiment = get_sentiment_for_noun_phrases_array(noun_phrases,
+                                                                                                   emoji_list)
                         opinion = Opinion(title=submission.title, text=submission.selftext,
-                                          sentiment=sentiment, date=submission_time.date(), link=submission.url
+                                          sentiment=sentiment, date=submission_time.date(), link=submission.url,
                                           )
                         opinions.append(opinion)
     except prawcore.exceptions.Redirect:
@@ -136,7 +140,7 @@ def get_opinions(topic, start_date, end_date):
                             noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                             sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
                             opinion = Opinion(title=submission.title, text=submission.selftext,
-                                              sentiment=sentiment, date=submission_time.date(),
+                                              sentiment=sentiment, date=submission_time.date()
                                               )
                             opinions.append(opinion)
         except prawcore.exceptions.Redirect:
@@ -162,7 +166,7 @@ def get_opinions(topic, start_date, end_date):
                             noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                             sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
                             opinion = Opinion(title=submission.title, text=submission.selftext,
-                                              sentiment=sentiment, date=submission_time.date(),
+                                              sentiment=sentiment, date=submission_time.date()
                                               )
                             opinions.append(opinion)
         except prawcore.exceptions.Redirect:
@@ -171,9 +175,7 @@ def get_opinions(topic, start_date, end_date):
             pass
 
 
-
     return opinions
-
 
 
 

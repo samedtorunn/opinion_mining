@@ -55,5 +55,5 @@ def emoji_scoring(s):
     return get_emoji_sentiment(emoji_list)
 
 print("HERE!")
-print(emoji_scoring("I love pizza 😡"))
+print(emoji_scoring("🚀"))
 

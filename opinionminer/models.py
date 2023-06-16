@@ -9,6 +9,7 @@ class Opinion(models.Model):
     comments = models.TextField(null=True, blank=True)
     likes = models.IntegerField(default=0, blank=True, null=True)
     link = models.URLField(null=True, blank=True)
+    total_sentiment_strength = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.title} ({self.sentiment})"

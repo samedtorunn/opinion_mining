@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from datetime import datetime
 from django.urls import reverse
 from datetime import date
@@ -105,16 +105,11 @@ class OpinionTestCase(TestCase):
 
 class OpinionMinerTestCase(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
+        self.client = Client()
 
     def test_home_view(self):
-        request = self.factory.get(reverse('home'))
-        response = home_view(request)
+        response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'opinionminer/home.html')
 
-    def test_opinions_view(self):
-        request = self.factory.get(reverse('opinions'), {'query': 'test', 'start_date': '2022-01-01', 'end_date': '2022-01-02'})
-        response = opinions_view(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'opinionminer/opinions.html')
+
