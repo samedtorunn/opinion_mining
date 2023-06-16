@@ -1,5 +1,6 @@
 from django import forms
 
+
 class QueryForm(forms.Form):
     query = forms.CharField(label='Enter a query', max_length=100)
     compare_to = forms.CharField(label='Compare to', max_length=100, required=False)

@@ -6,6 +6,9 @@ from datetime import datetime
 from langdetect import detect
 import prawcore
 import spacy
+import re
+import csv
+
 
 nlp = spacy.load('en_core_web_sm')
 
@@ -30,7 +33,7 @@ def get_sentiment(text):
         return 'neutral'
 
 
-def get_sentiment_for_noun_phrases_array(noun_phrases):
+def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         sentiment_scores = []
         for phrase in noun_phrases:
             blob = TextBlob(phrase)
@@ -40,6 +43,9 @@ def get_sentiment_for_noun_phrases_array(noun_phrases):
             # To get more sharp results, subjectivity is increased.
             if sentiment_subjectivity >= 0.7:
                 sentiment_scores.append(sentiment_score)
+
+        # Add emoji scores to the sentiment scores
+        sentiment_scores.extend(emoji_scores)
 
         # Calculate the overall sentiment based on the average score
         if len(sentiment_scores) == 0:
@@ -55,6 +61,7 @@ def get_sentiment_for_noun_phrases_array(noun_phrases):
         else:
             sentiment = 'neutral'
 
+        print(average_score)
         return sentiment
 
 
@@ -79,7 +86,6 @@ def correct_spelling(text):
     return corrected_text
 
 
-
 def get_opinions(topic, start_date, end_date):
     opinions = []
 
@@ -94,11 +100,12 @@ def get_opinions(topic, start_date, end_date):
             if start_time <= submission_time <= end_time:
                 lang = detect(submission.title + submission.selftext)
                 if lang == 'en' and has_sentence(submission.selftext):
+                    print(get_emojis(submission.selftext))
+                    emoji_list = emoji_scoring(submission.title + submission.selftext)
                     correct_spelling(submission.title)
                     correct_spelling(submission.selftext)
                     noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
-                    sentiment = get_sentiment_for_noun_phrases_array(noun_phrases)
-                    print(submission.url)
+                    sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
                     opinion = Opinion(title=submission.title, text=submission.selftext,
                                       sentiment=sentiment, date=submission_time.date(), link=submission.url
                                       )
@@ -120,10 +127,13 @@ def get_opinions(topic, start_date, end_date):
                 if start_time <= submission_time <= end_time:
                     lang = detect(submission.title + submission.selftext)
                     if lang == 'en' and has_sentence(submission.selftext):
+                        emoji_list = emoji_scoring(submission.title + submission.selftext)
+
+                        print(get_emojis(submission.selftext))
                         correct_spelling(submission.title)
                         correct_spelling(submission.selftext)
                         noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
-                        sentiment = get_sentiment_for_noun_phrases_array(noun_phrases)
+                        sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
                         opinion = Opinion(title=submission.title, text=submission.selftext,
                                           sentiment=sentiment, date=submission_time.date(),
                                           )
@@ -134,7 +144,56 @@ def get_opinions(topic, start_date, end_date):
             print("there is no subreddit on this topic.")
             pass
 
+        topic = topic.replace(" ", "_").lower()
+        if subreddit_exists(topic):
+            try:
+                # Retrieve posts from the specified subreddit
+                for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
+                    submission_time = datetime.fromtimestamp(submission.created_utc)
+                    if start_time <= submission_time <= end_time:
+                        lang = detect(submission.title + submission.selftext)
+                        if lang == 'en' and has_sentence(submission.selftext):
+                            emoji_list = emoji_scoring(submission.title + submission.selftext)
+                            correct_spelling(submission.title)
+                            correct_spelling(submission.selftext)
+                            noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
+                            sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
+                            opinion = Opinion(title=submission.title, text=submission.selftext,
+                                              sentiment=sentiment, date=submission_time.date(),
+                                              )
+                            opinions.append(opinion)
+            except prawcore.exceptions.Redirect:
+                pass
+            except prawcore.exceptions.NotFound:
+                print("there is no subreddit on this topic.")
+                pass
+
+        topic = topic.replace(" ", "_").lower()
+        if subreddit_exists(topic):
+            try:
+                # Retrieve posts from the specified subreddit
+                for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
+                    submission_time = datetime.fromtimestamp(submission.created_utc)
+                    if start_time <= submission_time <= end_time:
+                        lang = detect(submission.title + submission.selftext)
+                        if lang == 'en' and has_sentence(submission.selftext):
+                            emoji_list = emoji_scoring(submission.title + submission.selftext)
+                            correct_spelling(submission.title)
+                            correct_spelling(submission.selftext)
+                            noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
+                            sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
+                            opinion = Opinion(title=submission.title, text=submission.selftext,
+                                              sentiment=sentiment, date=submission_time.date(),
+                                              )
+                            opinions.append(opinion)
+            except prawcore.exceptions.Redirect:
+                pass
+            except prawcore.exceptions.NotFound:
+                print("there is no subreddit on this topic.")
+                pass
+
     return opinions
+
 
 
 def subreddit_exists(subreddit):
@@ -166,3 +225,42 @@ def get_sentiment_distribution(opinions):
 def has_sentence(text):
     doc = nlp(text)
     return any(sent.text.strip() for sent in doc.sents)
+
+
+def is_emoji(s):
+    emojis = re.findall(r'[^\w\s,]', s)
+    for emoji in emojis:
+        if '\U0001F300' <= emoji <= '\U0001F5FF' or '\U0001F600' <= emoji <= '\U0001F64F' or '\U0001F680' <= emoji <= '\U0001F6FF' or '\U0001F700' <= emoji <= '\U0001F77F' or '\U0001F780' <= emoji <= '\U0001F7FF' or '\U0001F800' <= emoji <= '\U0001F8FF' or '\U0001F900' <= emoji <= '\U0001F9FF' or '\U0001FA00' <= emoji <= '\U0001FA6F' or '\U0001FA70' <= emoji <= '\U0001FAFF' or '\U00002702' <= emoji <= '\U000027B0' or '\U0001F1E6' <= emoji <= '\U0001F1FF':
+            return True
+    return False
+
+
+
+emoji_sentiment_dict = {}
+
+with open('/Users/samed.torun/Desktop/opinion_mining/opinionminer/Emoji_Sentiment_Data_v1.0.csv', newline='', encoding='utf-8') as csvfile:
+
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        emoji = row['Emoji']
+        positive = int(row['Positive'])
+        negative = int(row['Negative'])
+        neutral = int(row['Neutral'])
+        sentiment_score = (positive - negative) / (positive + negative + neutral)
+        emoji_sentiment_dict[emoji] = sentiment_score
+
+def get_emojis(s):
+    emojis = re.findall(r'[^\w\s,]', s)
+    emoji_list = [emoji for emoji in emojis if '\U0001F300' <= emoji <= '\U0001F5FF' or '\U0001F600' <= emoji <= '\U0001F64F' or '\U0001F680' <= emoji <= '\U0001F6FF' or '\U0001F700' <= emoji <= '\U0001F77F' or '\U0001F780' <= emoji <= '\U0001F7FF' or '\U0001F800' <= emoji <= '\U0001F8FF' or '\U0001F900' <= emoji <= '\U0001F9FF' or '\U0001FA00' <= emoji <= '\U0001FA6F' or '\U0001FA70' <= emoji <= '\U0001FAFF' or '\U00002702' <= emoji <= '\U000027B0' or '\U0001F1E6' <= emoji <= '\U0001F1FF']
+    return emoji_list
+
+
+def get_emoji_sentiment(emojis):
+    sentiment_scores = [emoji_sentiment_dict.get(emoji, 0) for emoji in emojis]
+    filtered_scores = [score for score in sentiment_scores if score != 0] # the filter is applied since not all the emojis included in our Emoji Sentiment data
+    return filtered_scores
+
+def emoji_scoring(s):
+    emojis = re.findall(r'[^\w\s,]', s)
+    emoji_list = [emoji for emoji in emojis if '\U0001F300' <= emoji <= '\U0001F5FF' or '\U0001F600' <= emoji <= '\U0001F64F' or '\U0001F680' <= emoji <= '\U0001F6FF' or '\U0001F700' <= emoji <= '\U0001F77F' or '\U0001F780' <= emoji <= '\U0001F7FF' or '\U0001F800' <= emoji <= '\U0001F8FF' or '\U0001F900' <= emoji <= '\U0001F9FF' or '\U0001FA00' <= emoji <= '\U0001FA6F' or '\U0001FA70' <= emoji <= '\U0001FAFF' or '\U00002702' <= emoji <= '\U000027B0' or '\U0001F1E6' <= emoji <= '\U0001F1FF']
+    return get_emoji_sentiment(emoji_list)
