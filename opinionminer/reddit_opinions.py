@@ -40,7 +40,7 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         sentiment_subjectivity = blob.sentiment.subjectivity
 
         # To get more sharp results, subjectivity is increased.
-        if sentiment_subjectivity >= 0.7:
+        if sentiment_subjectivity >= 0.5:
             sentiment_scores.append(sentiment_score)
 
     # Add emoji scores to the sentiment scores
@@ -53,9 +53,9 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         average_score = sum(sentiment_scores) / len(sentiment_scores)
 
     # Assign sentiment label based on the average score
-    if average_score > 0:
+    if average_score > 0.3:
         sentiment = 'positive'
-    elif average_score < 0:
+    elif average_score < -0.3:
         sentiment = 'negative'
     else:
         sentiment = 'neutral'
