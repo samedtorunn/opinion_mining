@@ -53,6 +53,7 @@ Contributions are welcome! If you have any suggestions, bug reports, or feature 
 
 - The sentiment analysis component of this project is powered by the [TextBlob](https://textblob.readthedocs.io/) library.
 - The word cloud visualization is created using the [WordCloud](https://amueller.github.io/word_cloud/) library.
+- Construction and analysis of Emoji Sentiment Ranking is described in the following paper: P. Kralj Novak, J. Smailovic, B. Sluban, I. Mozetic,  Sentiment of Emojis, PLoS ONE 10(12): e0144296, doi:10.1371/journal.pone.0144296, 2015. (https://kt.ijs.si/data/Emoji_sentiment_ranking/index.html)
 - Special thanks to the Suzan Uskudarli who provides me the vision for this project.
 
 
