@@ -12,7 +12,6 @@ from textblob import TextBlob
 from .reddit_opinions import extract_noun_phrases, correct_spelling
 
 
-
 class TextProcessingTestCase(TestCase):
 
     def test_correct_spelling(self):
@@ -35,7 +34,7 @@ class OpinionTestCase(TestCase):
         opinions = get_opinions(topic, start_date, end_date)
 
         # Assert the test.
-        self.assertEqual(len(opinions), 0)  # Assuming there are no opinions in the specified date range
+        self.assertEqual(len(opinions), 0)
 
 
     def test_get_opinions(self):
@@ -63,7 +62,7 @@ class OpinionTestCase(TestCase):
 
     def test_opinions_view_no_opinions(self):
         # Test that opinions view handles no opinions found correctly
-        topic = 'NonExistentTopic'
+        topic = 'asadasdasdsafsadfsadasdsadasdewrwe'
         start_date = date.today()
         end_date = date.today()
         response = self.client.get(reverse('opinions'), {

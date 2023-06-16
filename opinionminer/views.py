@@ -94,7 +94,6 @@ def opinions_view(request):
         results = [analyze_opinions(topic, opinions, start_date, end_date)]
 
         if compare_to:
-
             compare_to_opinions = get_opinions(compare_to, start_date, end_date)
             if compare_to_opinions:
                 results.append(analyze_opinions(compare_to, compare_to_opinions, start_date, end_date))

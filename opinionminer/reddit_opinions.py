@@ -37,8 +37,8 @@ def get_sentiment_for_noun_phrases_array(noun_phrases):
             sentiment_score = blob.sentiment.polarity
             sentiment_subjectivity = blob.sentiment.subjectivity
 
-            # To get more sharp results, subjectivity is decreased.
-            if sentiment_subjectivity <= 0.3:
+            # To get more sharp results, subjectivity is increased.
+            if sentiment_subjectivity >= 0.7:
                 sentiment_scores.append(sentiment_score)
 
         # Calculate the overall sentiment based on the average score
