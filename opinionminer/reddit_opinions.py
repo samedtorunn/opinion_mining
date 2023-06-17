@@ -11,6 +11,10 @@ import csv
 from wordcloud import STOPWORDS
 
 
+# This function
+
+
+
 nlp = spacy.load('en_core_web_sm')
 
 # Creative_Intern7785
@@ -69,6 +73,8 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
 def extract_noun_phrases_with_TextBlob(text):
     blob = TextBlob(text)
     return blob.noun_phrases
+
+
 
 def extract_noun_phrases(text):
     text = text.lower()  #lowering the text characters
@@ -245,3 +251,17 @@ def emoji_scoring(s):
     emojis = re.findall(r'[^\w\s,]', s)
     emoji_list = [emoji for emoji in emojis if '\U0001F300' <= emoji <= '\U0001F5FF' or '\U0001F600' <= emoji <= '\U0001F64F' or '\U0001F680' <= emoji <= '\U0001F6FF' or '\U0001F700' <= emoji <= '\U0001F77F' or '\U0001F780' <= emoji <= '\U0001F7FF' or '\U0001F800' <= emoji <= '\U0001F8FF' or '\U0001F900' <= emoji <= '\U0001F9FF' or '\U0001FA00' <= emoji <= '\U0001FA6F' or '\U0001FA70' <= emoji <= '\U0001FAFF' or '\U00002702' <= emoji <= '\U000027B0' or '\U0001F1E6' <= emoji <= '\U0001F1FF']
     return get_emoji_sentiment(emoji_list)
+
+
+# This function is not in use since it may change the meaning of the noun phrases that includes a phrasal verb like "give up"
+def remove_stopwords(noun_phrases):
+    cleaned_phrases = []
+    for phrase in noun_phrases:
+        # Split the phrase into individual words
+        words = phrase.split()
+        # Remove stop words from the words list
+        filtered_words = [word for word in words if word.lower() not in STOPWORDS]
+        # Reconstruct the cleaned phrase
+        cleaned_phrase = ' '.join(filtered_words)
+        cleaned_phrases.append(cleaned_phrase)
+    return cleaned_phrases
