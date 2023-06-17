@@ -1,24 +1,69 @@
 {% if result.sentiment_distribution %}
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Sentiment</th>
-                <th>Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Positive</td>
-                <td>{{ result.sentiment_distribution.positive }}</td>
-            </tr>
-            <tr>
-                <td>Neutral</td>
-                <td>{{ result.sentiment_distribution.neutral }}</td>
-            </tr>
-            <tr>
-                <td>Negative</td>
-                <td>{{ result.sentiment_distribution.negative }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Sentiment</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Positive</td>
+                        <td>{{ result.sentiment_distribution.positive }}</td>
+                    </tr>
+                    <tr>
+                        <td>Neutral</td>
+                        <td>{{ result.sentiment_distribution.neutral }}</td>
+                    </tr>
+                    <tr>
+                        <td>Negative</td>
+                        <td>{{ result.sentiment_distribution.negative }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <canvas id="sentimentChart"></canvas>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('sentimentChart').getContext('2d');
+            var sentimentData = {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{
+                    data: [
+                        {{ result.sentiment_distribution.positive }},
+                        {{ result.sentiment_distribution.neutral }},
+                        {{ result.sentiment_distribution.negative }}
+                    ],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 205, 86, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            var sentimentChart = new Chart(ctx, {
+                type: 'pie',
+                data: sentimentData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            });
+        });
+    </script>
 {% endif %}

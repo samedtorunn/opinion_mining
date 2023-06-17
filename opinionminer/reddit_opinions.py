@@ -8,6 +8,8 @@ import prawcore
 import spacy
 import re
 import csv
+from wordcloud import STOPWORDS
+
 
 nlp = spacy.load('en_core_web_sm')
 
@@ -53,9 +55,9 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         average_score = sum(sentiment_scores) / len(sentiment_scores)
 
     # Assign sentiment label based on the average score
-    if average_score > 0.3:
+    if average_score > 0.2:
         sentiment = 'positive'
-    elif average_score < -0.3:
+    elif average_score < -0.2:
         sentiment = 'negative'
     else:
         sentiment = 'neutral'
