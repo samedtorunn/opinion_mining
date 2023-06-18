@@ -13,7 +13,6 @@ from wordcloud import STOPWORDS
 
 nlp = spacy.load('en_core_web_sm')
 
-# Creative_Intern7785
 
 
 reddit = praw.Reddit(client_id=client_id,
