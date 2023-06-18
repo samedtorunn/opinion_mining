@@ -11,10 +11,6 @@ import csv
 from wordcloud import STOPWORDS
 
 
-# This function
-
-
-
 nlp = spacy.load('en_core_web_sm')
 
 # Creative_Intern7785
@@ -39,6 +35,7 @@ def get_sentiment(text):
 
 
 def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
+    #SUBJECTIVITY
     sentiment_scores = []
     for phrase in noun_phrases:
         blob = TextBlob(phrase)
@@ -46,7 +43,7 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         sentiment_subjectivity = blob.sentiment.subjectivity
 
         # To get more sharp results, subjectivity is increased.
-        if sentiment_subjectivity >= 0.5:
+        if sentiment_subjectivity >= 0.5:  # WHY 0.5 IS CHOSEN CAN BE EXPLAINED HERE. CONFIFURATIN MANAGEMENT TOOLS, CHECK HYDRA.
             sentiment_scores.append(sentiment_score)
 
     # Add emoji scores to the sentiment scores
@@ -59,9 +56,9 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         average_score = sum(sentiment_scores) / len(sentiment_scores)
 
     # Assign sentiment label based on the average score
-    if average_score > 0.2:
+    if average_score > 0.05:
         sentiment = 'positive'
-    elif average_score < -0.2:
+    elif average_score < -0.05:
         sentiment = 'negative'
     else:
         sentiment = 'neutral'
@@ -83,7 +80,6 @@ def extract_noun_phrases(text):
     for chunk in doc.noun_chunks:
         noun_phrases.append(chunk.text)
 
-    print(noun_phrases)
     return noun_phrases
 
 
@@ -94,7 +90,7 @@ def correct_spelling(text):
     return corrected_text
 
 
-def get_opinions(topic, start_date, end_date):
+def get_opinions(topic, start_date, end_date): ### CHECK THIS FUNCTION IF IT GETS ALL THE RELATED POSTS OR NOT. !!!
     opinions = []
     fetched_opinions = set()  # Set to store unique opinion identifiers
 
@@ -105,10 +101,12 @@ def get_opinions(topic, start_date, end_date):
     try:
         # Retrieve posts from the general Reddit search
         for submission in reddit.subreddit('all').search(topic, time_filter='all'):
+            #print(submission.title)
             submission_time = datetime.fromtimestamp(submission.created_utc)
             if start_time <= submission_time <= end_time:
+                print(submission.title)
                 lang = detect(submission.title + submission.selftext)
-                if lang == 'en' and has_sentence(submission.selftext):
+                if lang == 'en' and has_sentence(submission.selftext):  # --> if this is filtered out, the change is 13 from 9
                     opinion_id = submission.id  # Get unique identifier of the opinion
                     if opinion_id not in fetched_opinions:
                         fetched_opinions.add(opinion_id)  # Add opinion identifier to set

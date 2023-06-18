@@ -128,12 +128,13 @@ def create_and_save_graphs(topic: str, opinions: list[Opinion], datewise_opinion
     plt.figure(figsize=(12, 6))
 
     # Define colors
-    colors = ['lightgray', 'green', 'red']
+    colors = ['#FFA500', 'lightblue', 'lightcoral']  # Using hexadecimal code for light orange
 
-    # Plot trend lines
-    plt.plot(dates, positive_counts, label='Positive', color=colors[1], linewidth=2)
-    plt.plot(dates, neutral_counts, label='Neutral', color=colors[0], linewidth=1)
-    plt.plot(dates, negative_counts, label='Negative', color=colors[2], linewidth=2)
+    # Plot as stacked bar chart
+    plt.bar(dates, positive_counts, label='Positive', color=colors[1])
+    plt.bar(dates, neutral_counts, label='Neutral', color=colors[0], bottom=positive_counts)
+    negative_bottoms = [positive_counts[i] + neutral_counts[i] for i in range(len(positive_counts))]
+    plt.bar(dates, negative_counts, label='Negative', color=colors[2], bottom=negative_bottoms)
 
     for sentiment, regression_line in regression_lines.items():
         y_pred = regression_line.predict(x)
@@ -148,6 +149,8 @@ def create_and_save_graphs(topic: str, opinions: list[Opinion], datewise_opinion
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
+    plt.ylim(0, max(max(positive_counts), max(neutral_counts), max(negative_counts)) * 1.2)  # Set the y-limits
+
 
     # Save the trend graph
     trend_graph = f'/static/opinionminer/trend_graph-{uuid4()}.png'
@@ -157,7 +160,35 @@ def create_and_save_graphs(topic: str, opinions: list[Opinion], datewise_opinion
     # Generate word cloud data
     text_data = ' '.join(opinion.text for opinion in opinions)
     excluded_words = set(STOPWORDS)  # Use the set of default STOPWORDS
-    excluded_words.update(['https', 'www', 'com'])  # Add additional words to exclude
+
+
+    url_stop_words = [
+        "http",
+        "https",
+        "www",
+        "com",
+        "net",
+        "org",
+        "edu",
+        "gov",
+        "co",
+        "io",
+        "www2",
+        "ftp",
+        "html",
+        "php",
+        "aspx",
+        "index",
+        "xml",
+        "jpg",
+        "png",
+        "gif",
+        "pdf",
+        "webp"
+    ]
+
+    excluded_words.update(url_stop_words)  # Add URL-specific stop words to the set of excluded words
+
     wordcloud = WordCloud(width=1200, height=400, background_color='white', stopwords=excluded_words).generate(
         text_data)
 
