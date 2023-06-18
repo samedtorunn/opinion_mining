@@ -24,7 +24,6 @@ The part below may not work properly since there is a constant update process on
 - Perform sentiment analysis on collected opinions to determine the overall sentiment using TextBlob.
 - Generate visualizations, such as trend graphs and word clouds, to visualize sentiment trends and popular keywords.
 - Ability to opinions based on specific topics, time intervals, and sentiment categories.
-- Support for multiple languages and customizable sentiment analysis models.
 - Easy-to-use web interface for querying and visualizing opinions.
 
 
