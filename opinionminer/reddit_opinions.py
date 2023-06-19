@@ -44,8 +44,11 @@ def get_sentiment_for_noun_phrases_array(noun_phrases, emoji_scores):
         sentiment_subjectivity = blob.sentiment.subjectivity
 
         # To get more sharp results, subjectivity is increased.
-        if sentiment_subjectivity >= 0.5:  # WHY 0.5 IS CHOSEN CAN BE EXPLAINED HERE. CONFIFURATIN MANAGEMENT TOOLS, CHECK HYDRA.
+        if sentiment_subjectivity >= 0.7:  # WHY 0.5 IS CHOSEN CAN BE EXPLAINED HERE. CONFIFURATIN MANAGEMENT TOOLS, CHECK HYDRA.
             sentiment_scores.append(sentiment_score)
+            print("Noun Phrase", phrase)
+            print("Score", sentiment_score)
+
 
     # Add emoji scores to the sentiment scores
     sentiment_scores.extend(emoji_scores)
@@ -104,16 +107,16 @@ def get_opinions(topic, start_date, end_date): ### CHECK THIS FUNCTION IF IT GET
         for submission in reddit.subreddit('all').search(topic, time_filter='all'):
             #print(submission.title)
             submission_time = datetime.fromtimestamp(submission.created_utc)
-            if start_time <= submission_time <= end_time:
-                print(submission.title)
-                lang = detect(submission.title + submission.selftext)
-                if lang == 'en' and has_sentence(submission.selftext):  # --> if this is filtered out, the change is 13 from 9
+            if start_time <= submission_time <= end_time and submission.title and submission.selftext:
+                #print(submission.title)
+                #lang = detect(submission.title + submission.selftext)
+                if has_sentence(submission.selftext):  # --> if this is filtered out, the change is 13 from 9
                     opinion_id = submission.id  # Get unique identifier of the opinion
                     if opinion_id not in fetched_opinions:
                         fetched_opinions.add(opinion_id)  # Add opinion identifier to set
                         emoji_list = emoji_scoring(submission.title + submission.selftext)
-                        correct_spelling(submission.title)
-                        correct_spelling(submission.selftext)
+                        submission.title = correct_spelling(submission.title)
+                        submission.selftext = correct_spelling(submission.selftext)
                         noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                         sentiment = get_sentiment_for_noun_phrases_array(noun_phrases,
                                                                                                    emoji_list)
@@ -136,14 +139,14 @@ def get_opinions(topic, start_date, end_date): ### CHECK THIS FUNCTION IF IT GET
             for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
                 submission_time = datetime.fromtimestamp(submission.created_utc)
                 if start_time <= submission_time <= end_time:
-                    lang = detect(submission.title + submission.selftext)
-                    if lang == 'en' and has_sentence(submission.selftext):
+                    #lang = detect(submission.title + submission.selftext)
+                    if has_sentence(submission.selftext):
                         opinion_id = submission.id  # Get unique identifier of the opinion
                         if opinion_id not in fetched_opinions:
                             fetched_opinions.add(opinion_id)  # Add opinion identifier to set
                             emoji_list = emoji_scoring(submission.title + submission.selftext)
-                            correct_spelling(submission.title)
-                            correct_spelling(submission.selftext)
+                            submission.title = correct_spelling(submission.title)
+                            submission.selftext = correct_spelling(submission.selftext)
                             noun_phrases = extract_noun_phrases(submission.title + submission.selftext)
                             sentiment = get_sentiment_for_noun_phrases_array(noun_phrases, emoji_list)
                             opinion = Opinion(title=submission.title, text=submission.selftext,
@@ -162,8 +165,8 @@ def get_opinions(topic, start_date, end_date): ### CHECK THIS FUNCTION IF IT GET
             for submission in reddit.subreddit(topic).search(topic, time_filter='all'):
                 submission_time = datetime.fromtimestamp(submission.created_utc)
                 if start_time <= submission_time <= end_time:
-                    lang = detect(submission.title + submission.selftext)
-                    if lang == 'en' and has_sentence(submission.selftext):
+                    #lang = detect(submission.title + submission.selftext)
+                    if has_sentence(submission.selftext):
                         opinion_id = submission.id  # Get unique identifier of the opinion
                         if opinion_id not in fetched_opinions:
                             fetched_opinions.add(opinion_id)  # Add opinion identifier to set
@@ -193,7 +196,6 @@ def subreddit_exists(subreddit):
     except prawcore.exceptions.NotFound:
         exists = False
     return exists
-
 
 
 def get_sentiment_distribution(opinions):
